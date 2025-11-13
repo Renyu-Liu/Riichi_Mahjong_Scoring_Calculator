@@ -1,51 +1,62 @@
-# CS-128H-Group-12-Project
-Group member names and NetIDs:
-@Thomas (tj29) @Karan (annam17) @Renyu Liu (renyul2) 
-Project Introduction
+## CS-128H-Group-12-Project
+# Group member names and NetIDs: @Thomas (tj29) @Karan (annam17) @Renyu Liu (renyul2) 
+# Project Name: Riichi Mahjong Score Calculator
 
-This project is a scoring calculator for Riichi Mahjong. It will take a game's state as an input and calculate the points when a user wins the game. We have chosen to work on this project because Mahjong is a pretty interesting game with a lot of different qualifications that can affect score, so there's quite a bit to take account of.  
-The scoring rules in Riichi Mahjong is complicated for players to calculate with their hands. So this project would help users to calculate the points when users have won a game. 
+# About This Program
 
+This is a Rust library that calculates the score of a winning Riichi Mahjong hand. It takes a complete description of the hand and game state, validates it, and returns a detailed score breakdown.
 
-Technical Overview
+# The Logical Flow
 
-This will include 4 modules:
+The calculator operates in a clear sequence:
 
-Input stage: Users will input their winning hand (unorganized), winning tile, and game conditions. 
+Validate Input (raw_hand_organizer.rs): First, it checks your UserInput for any logical errors (e.g., "Haitei" win on a "Ron", or "Menzen" declared with open melds). It will return an error if an impossible state is found.
 
-1: Special Yaku Checker: special Yaku (seven pairs, 13 orphans, etc) will be checked first. If detected, jump over the next 2 modules and calculate scores.
+Parse Hand (raw_hand_organizer.rs): It organizes the raw tile list into a standard 4-meld, 1-pair structure. If this fails, it flags the hand as "Irregular" to be checked for Kokushi Musou or Chiitoitsu.
 
-2: Raw Hand Organizer: If no special Yaku is detected, organize the hand into 4 melds and 1 pair. Figure out the wait type.
+Check Yaku (yaku_checker.rs): It finds all Yaku. It checks for Yakuman first. If no Yakuman, it finds all regular Yaku (e.g., Pinfu, Tanyao) and counts all Dora (Aka, Omote, Ura).
 
-3: Yaku Checker: check for ordinary yaku. If no yaku is found, throw error "no yaku".
+Calculate Score (score_calculator.rs): Finally, it converts the Yaku list into Han and calculates the Fu based on the hand's composition. It applies score limits (e.g., Mangan, Haneman) and calculates the final point payments, including Honba.
 
-4: score calculator: calculate the final scores by Fu and Fan
+# How to Provide Input
 
-Output stage: return the final score
+You must provide a single UserInput struct, which contains:
 
-Likely by Checkpoint 1: Write some gate states, some impl to verify the state is valid. Write some hands, verify we can detect an illegal hand or invalid win.
+hand_tiles: A Vec<Hai> of all 14+ tiles in your hand.
 
-Likely by Checkpoint 2: Finish game states, finish hands, make progress on the implementation to find the 'best' possible hand without endless iteration. 
+winning_tile: The single Hai that completed the hand.
 
-Possible Challenges
+open_melds: A list of any open calls (Chi, Pon, open Kan).
 
-Writing implementations may get complex and involved. Hands might be hard to implement the 'wildcard' for suits and unique hands. Calculating the score will probably be complex if we don't use a lot of OOP magic.  
-We could also create a UI, with a display of how scoring is calculated, but this might not happen due to time. 
+closed_kans: A list of any closed Kans (Ankan).
 
-References
+agari_type: How the hand was won (AgariType::Tsumo or AgariType::Ron).
 
-Input: Users will type in: 
+player_context: Your status (dealer, seat wind, Riichi status, etc.).
 
-1: the winning hand: including 14-18 tiles, indicating the winning tile; 
+game_context: The game state (round wind, Honba, Dora indicators, etc.).
 
-2: indicate which tiles are dora; 
+# Expected Output
 
-3: indicate the prevalent wind and seat wind; 
+The program will return a Result<AgariResult, &'static str>.
 
-4: check true / false: trumo/ron, concealed hand/open hand, Riichi/Ippatsu
+On Success: AgariResult
 
-1: check and identify the type of yaku
+An object containing the full score:
 
-2: calculate fu, han, to get the points
+han: Total Han count.
 
-Output: the points users get from winning this game
+fu: Total Fu count (rounded, 0 for Yakuman).
+
+yaku_list: A list of all Yaku and Dora achieved.
+
+limit_name: (Optional) The hand's limit, e.g., HandLimit::Mangan.
+
+total_payment: The total points you receive.
+
+oya_payment / ko_payment: A breakdown of who pays what.
+
+On Failure: Error Message
+
+A &'static str describing the error.
+Example: "Invalid hand: Contains 5 or more of a single tile type."
