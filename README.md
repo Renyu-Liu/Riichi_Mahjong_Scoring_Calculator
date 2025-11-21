@@ -1,6 +1,9 @@
 CS-128H-Group-12-Project
+
 Worked with help of Google Gemini
+
 Group member names and NetIDs: @Thomas (tj29) @Karan (annam17) @Renyu Liu (renyul2) 
+
 # Project Name: Riichi Mahjong Score Calculator
 
 ## About This Program
