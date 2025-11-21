@@ -1,10 +1,8 @@
 Todo list:
 
-1: the whole program is way too large (1.5GB). Delete unnecessary files
+1: develop a way that common users can use this program. That is, considering users don't understand how to use Rust and VSCode, provide a way to run the program without Rust and VSCode. It should be cross-platform.
 
-2: make the program runnable on Windows
-
-3: Improve GUI
+2: Improve GUI
 
 # Project Name: Riichi Mahjong Score Calculator
 
