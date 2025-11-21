@@ -9,7 +9,7 @@ use super::types::{
 };
 use super::yaku_checker::YakuResult;
 
-
+// will be called by gui.rs
 pub fn calculate_score(
     yaku_result: YakuResult,
     player: &PlayerContext,
@@ -25,42 +25,43 @@ pub fn calculate_score(
     let num_yakuman = count_yakuman(&yaku_list);
 
     if num_yakuman > 0 {
-        let han = 13 * num_yakuman as u8; 
-        let fu = 0; 
+        let han = 13 * num_yakuman as u8;
+        let fu = 0;
         let limit_name = Some(HandLimit::Yakuman);
         let base_yakuman_points = (8000 * num_yakuman) as u32;
 
-        let (base_points, oya_payment, ko_payment, total_payment) = match (player.is_oya, agari_type) {
-            // Oya Tsumo
-            (true, AgariType::Tsumo) => {
-                let p = round_up_100(base_yakuman_points * 2);
-                let total = (p + tsumo_bonus) * 3;
-                (p, p, 0, total)
-            }
-            // Ko Tsumo
-            (false, AgariType::Tsumo) => {
-                let oya_p = round_up_100(base_yakuman_points * 2);
-                let ko_p = round_up_100(base_yakuman_points * 1);
-                let total = (oya_p + tsumo_bonus) + (ko_p + tsumo_bonus) * 2;
-                (ko_p, oya_p, ko_p, total)
-            }
-            // Oya Ron
-            (true, AgariType::Ron) => {
-                let total = round_up_100(base_yakuman_points * 6) + ron_bonus;
-                (total, 0, 0, total)
-            }
-            // Ko Ron
-            (false, AgariType::Ron) => {
-                let total = round_up_100(base_yakuman_points * 4) + ron_bonus;
-                (total, 0, 0, total)
-            }
-        };
+        let (base_points, oya_payment, ko_payment, total_payment) =
+            match (player.is_oya, agari_type) {
+                // Oya Tsumo
+                (true, AgariType::Tsumo) => {
+                    let p = round_up_100(base_yakuman_points * 2);
+                    let total = (p + tsumo_bonus) * 3;
+                    (p, p, 0, total)
+                }
+                // Ko Tsumo
+                (false, AgariType::Tsumo) => {
+                    let oya_p = round_up_100(base_yakuman_points * 2);
+                    let ko_p = round_up_100(base_yakuman_points * 1);
+                    let total = (oya_p + tsumo_bonus) + (ko_p + tsumo_bonus) * 2;
+                    (ko_p, oya_p, ko_p, total)
+                }
+                // Oya Ron
+                (true, AgariType::Ron) => {
+                    let total = round_up_100(base_yakuman_points * 6) + ron_bonus;
+                    (total, 0, 0, total)
+                }
+                // Ko Ron
+                (false, AgariType::Ron) => {
+                    let total = round_up_100(base_yakuman_points * 4) + ron_bonus;
+                    (total, 0, 0, total)
+                }
+            };
 
         return AgariResult {
             han,
             fu,
             yaku_list,
-            num_akadora: 0, 
+            num_akadora: 0,
             limit_name,
             base_points,
             oya_payment,
@@ -72,7 +73,7 @@ pub fn calculate_score(
         };
     }
 
-    // Regular Hand Path 
+    // Regular Hand Path
     let han = calculate_han(&yaku_list, player.is_menzen);
     let fu = calculate_fu(
         &yaku_result.hand_structure,
@@ -115,7 +116,7 @@ pub fn calculate_score(
         han,
         fu,
         yaku_list,
-        num_akadora, 
+        num_akadora,
         limit_name,
         base_points,
         oya_payment,
@@ -127,7 +128,7 @@ pub fn calculate_score(
     }
 }
 
-// Helper Functions
+// ---Helper Functions---
 
 fn calculate_han(yaku_list: &[Yaku], is_menzen: bool) -> u8 {
     yaku_list
@@ -138,7 +139,7 @@ fn calculate_han(yaku_list: &[Yaku], is_menzen: bool) -> u8 {
 
 fn get_han_value(yaku: &Yaku, is_menzen: bool) -> u8 {
     match yaku {
-        // 1 Han 
+        // 1 Han
         Yaku::Riichi => 1,
         Yaku::Ippatsu => 1,
         Yaku::MenzenTsumo => 1,
@@ -153,7 +154,7 @@ fn get_han_value(yaku: &Yaku, is_menzen: bool) -> u8 {
         Yaku::YakuhaiBakaze => 1,
         Yaku::YakuhaiSangenpai => 1,
 
-        // 2 Han 
+        // 2 Han
         Yaku::DaburuRiichi => 2,
         Yaku::Chiitoitsu => 2,
         Yaku::Toitoi => 2,
@@ -163,19 +164,55 @@ fn get_han_value(yaku: &Yaku, is_menzen: bool) -> u8 {
         Yaku::Shousangen => 2,
         Yaku::Honroutou => 2,
         // Kuisagari (2 -> 1)
-        Yaku::SanshokuDoujun => if is_menzen { 2 } else { 1 },
-        Yaku::Ittsu => if is_menzen { 2 } else { 1 },
-        Yaku::Chanta => if is_menzen { 2 } else { 1 },
+        Yaku::SanshokuDoujun => {
+            if is_menzen {
+                2
+            } else {
+                1
+            }
+        }
+        Yaku::Ittsu => {
+            if is_menzen {
+                2
+            } else {
+                1
+            }
+        }
+        Yaku::Chanta => {
+            if is_menzen {
+                2
+            } else {
+                1
+            }
+        }
 
-        // 3 Han 
+        // 3 Han
         Yaku::Ryanpeikou => 3,
         // Kuisagari (3 -> 2)
-        Yaku::Junchan => if is_menzen { 3 } else { 2 },
-        Yaku::Honitsu => if is_menzen { 3 } else { 2 },
+        Yaku::Junchan => {
+            if is_menzen {
+                3
+            } else {
+                2
+            }
+        }
+        Yaku::Honitsu => {
+            if is_menzen {
+                3
+            } else {
+                2
+            }
+        }
 
         // 6 Han
         // Kuisagari (6 -> 5)
-        Yaku::Chinitsu => if is_menzen { 6 } else { 5 },
+        Yaku::Chinitsu => {
+            if is_menzen {
+                6
+            } else {
+                5
+            }
+        }
 
         // Dora
         Yaku::Dora => 1,
@@ -198,12 +235,16 @@ fn calculate_fu(
         return 25;
     }
 
-    // Pinfu 
+    // Pinfu
     if yaku_list.contains(&Yaku::Pinfu) {
-        return if agari_type == AgariType::Tsumo { 20 } else { 30 };
+        return if agari_type == AgariType::Tsumo {
+            20
+        } else {
+            30
+        };
     }
 
-    // Standard Fu  
+    // Standard Fu
     let mut fu = 20;
 
     let hand = match hand_structure {
@@ -220,7 +261,7 @@ fn calculate_fu(
         fu += 10; // Menzen Ron fu
     }
 
-    // Melds 
+    // Melds
     for mentsu in &hand.mentsu {
         let is_open = mentsu.is_minchou;
         let is_yaochuu = mentsu.tiles[0].is_yaochuu();
@@ -236,20 +277,20 @@ fn calculate_fu(
             }
             MentsuType::Kantsu => {
                 fu += match (is_open, is_yaochuu) {
-                    (true, false) => 8,  // Open simple quad
-                    (true, true) => 16,  // Open terminal/honor quad
+                    (true, false) => 8,   // Open simple quad
+                    (true, true) => 16,   // Open terminal/honor quad
                     (false, false) => 16, // Concealed simple quad
-                    (false, true) => 32, // Concealed terminal/honor quad
+                    (false, true) => 32,  // Concealed terminal/honor quad
                 };
             }
             MentsuType::Shuntsu => {} // Sequences are 0 fu
         }
     }
 
-    // Pair 
+    // Pair
     fu += get_pair_fu(&hand.atama.0, player, game);
 
-    // Wait 
+    // Wait
     match hand.machi {
         Machi::Kanchan | Machi::Penchan | Machi::Tanki => fu += 2,
         _ => {} // Ryanmen and Shanpon are 0 fu

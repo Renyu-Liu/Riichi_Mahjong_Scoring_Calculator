@@ -3,9 +3,9 @@
 use super::types::{
     game::{AgariType, GameContext, PlayerContext},
     hand::{AgariHand, HandOrganization, Machi, Mentsu, MentsuType},
+    input::UserInput,
     // Import centralized helper functions
-    tiles::{index_to_tile, tile_to_index, Hai, Suhai},
-    input::{UserInput},
+    tiles::{Hai, Suhai, index_to_tile, tile_to_index},
 };
 use std::convert::TryInto;
 
@@ -70,7 +70,9 @@ mod input_validator {
                 return Err("Invalid state: Chiihou must be a Tsumo win.");
             }
             if !input.open_melds.is_empty() || !input.closed_kans.is_empty() {
-                return Err("Invalid state: Chiihou cannot have any calls (no open melds or kans).");
+                return Err(
+                    "Invalid state: Chiihou cannot have any calls (no open melds or kans).",
+                );
             }
         }
         if g.is_renhou && a != AgariType::Ron {
@@ -80,7 +82,7 @@ mod input_validator {
         Ok(())
     }
 
-    /// invalid hand composition 
+    /// invalid hand composition
     fn validate_hand_composition(
         input: &UserInput,
         master_counts: &[u8; 34],
@@ -98,7 +100,6 @@ mod input_validator {
                 .filter(|m| m.mentsu_type == MentsuType::Kantsu)
                 .count();
 
-        
         let expected_tiles = (total_kans * 4) + ((4 - total_kans) * 3) + 2;
 
         let hand_len = input.hand_tiles.len();
@@ -129,7 +130,7 @@ mod input_validator {
                 "Invalid input: Number of akadora exceeds the total number of '5' tiles in the hand.",
             );
         }
-        
+
         if input.game_context.num_akadora > 4 {
             return Err("Invalid input: Number of akadora cannot be greater than 4.");
         }
@@ -144,9 +145,9 @@ mod input_validator {
             input.agari_type,
             input,
         )?;
-        
+
         validate_hand_composition(input, master_counts)?;
-        
+
         Ok(())
     }
 }
@@ -172,7 +173,7 @@ mod recursive_parser {
             mentsu.push(Mentsu {
                 mentsu_type: MentsuType::Koutsu,
                 is_minchou: false, // is_open
-                tiles: [tile, tile, tile, tile], 
+                tiles: [tile, tile, tile, tile],
             });
 
             if find_mentsu_recursive(counts, mentsu) {
@@ -225,11 +226,7 @@ mod wait_analyzer {
         }
     }
 
-    pub fn determine_wait_type(
-        mentsu: &[Mentsu; 4],
-        atama: (Hai, Hai), 
-        agari_hai: Hai,    
-    ) -> Machi {
+    pub fn determine_wait_type(mentsu: &[Mentsu; 4], atama: (Hai, Hai), agari_hai: Hai) -> Machi {
         if agari_hai == atama.0 {
             return Machi::Tanki;
         }
@@ -268,9 +265,7 @@ mod wait_analyzer {
     }
 }
 
-
 pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str> {
-    
     let mut master_counts = [0u8; 34];
     for tile in &input.hand_tiles {
         master_counts[tile_to_index(tile)] += 1;
@@ -290,7 +285,7 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
         concealed_counts[index] -= 4;
         final_mentsu.push(Mentsu {
             mentsu_type: MentsuType::Kantsu,
-            is_minchou: false, 
+            is_minchou: false,
             tiles: [kan_tile, kan_tile, kan_tile, kan_tile],
         });
     }
@@ -307,8 +302,8 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
                 concealed_counts[index] -= 3;
                 final_mentsu.push(Mentsu {
                     mentsu_type: MentsuType::Koutsu,
-                    is_minchou: true, 
-                    tiles: [rep_tile, rep_tile, rep_tile, rep_tile], 
+                    is_minchou: true,
+                    tiles: [rep_tile, rep_tile, rep_tile, rep_tile],
                 });
             }
             MentsuType::Kantsu => {
@@ -318,7 +313,7 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
                 concealed_counts[index] -= 4;
                 final_mentsu.push(Mentsu {
                     mentsu_type: MentsuType::Kantsu,
-                    is_minchou: true, 
+                    is_minchou: true,
                     tiles: [rep_tile, rep_tile, rep_tile, rep_tile],
                 });
             }
@@ -346,8 +341,8 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
                 let t3 = index_to_tile(index3);
                 final_mentsu.push(Mentsu {
                     mentsu_type: MentsuType::Shuntsu,
-                    is_minchou: true, 
-                    tiles: [t1, t2, t3, t3], 
+                    is_minchou: true,
+                    tiles: [t1, t2, t3, t3],
                 });
             }
         }
@@ -371,14 +366,14 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
                     mentsu: mentsu_array,
                     atama,
                     agari_hai,
-                    machi: Machi::Tanki, 
+                    machi: Machi::Tanki,
                 };
 
                 return Ok(HandOrganization::YonmentsuIchiatama(agari_hand));
             }
         }
         if input.hand_tiles.len() == 14 {
-             // placeholder
+            // placeholder
         } else {
             return Err("Invalid hand: 4 open melds but no pair found.");
         }
@@ -387,7 +382,7 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
     // Standard Hand
     for i in 0..34 {
         if concealed_counts[i] >= 2 {
-            let mut temp_counts = concealed_counts; 
+            let mut temp_counts = concealed_counts;
             temp_counts[i] -= 2;
             let atama = (index_to_tile(i), index_to_tile(i));
             let mut closed_mentsu: Vec<Mentsu> = Vec::with_capacity(mentsu_needed);
@@ -400,8 +395,7 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
                         .try_into()
                         .expect("Hand parsing logic error: final_mentsu length not 4");
 
-                    let machi =
-                        wait_analyzer::determine_wait_type(&mentsu_array, atama, agari_hai);
+                    let machi = wait_analyzer::determine_wait_type(&mentsu_array, atama, agari_hai);
 
                     let agari_hand = AgariHand {
                         mentsu: mentsu_array,

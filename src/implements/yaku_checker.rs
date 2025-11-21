@@ -3,7 +3,7 @@
 use super::types::{
     game::{AgariType, GameContext, PlayerContext},
     hand::{AgariHand, HandOrganization, HandStructure, Machi, Mentsu, MentsuType},
-    tiles::{index_to_tile, tile_to_index, Hai, Jihai, Kaze, Sangenpai, Suhai},
+    tiles::{Hai, Jihai, Kaze, Sangenpai, Suhai, index_to_tile, tile_to_index},
     yaku::Yaku,
 };
 use std::collections::{HashMap, HashSet};
@@ -15,13 +15,14 @@ pub struct YakuResult {
     pub num_akadora: u8,
 }
 
+// will be called by score_calculator.rs
 pub fn check_all_yaku(
     organization: HandOrganization,
     player: &PlayerContext,
     game: &GameContext,
     agari_type: AgariType,
 ) -> Result<YakuResult, &'static str> {
-    // game-state Yakuman 
+    // game-state Yakuman
     let mut yakuman_list = check_game_state_yakuman(player, game);
 
     // hand-based Yakuman
@@ -43,7 +44,7 @@ pub fn check_all_yaku(
         });
     }
 
-    // regular yaku 
+    // regular yaku
     let mut regular_yaku: Vec<Yaku> = match &hand_structure {
         HandStructure::YonmentsuIchiatama(agari_hand) => {
             find_standard_yaku(agari_hand, player, game, agari_type)
@@ -57,8 +58,7 @@ pub fn check_all_yaku(
     };
 
     // Dora
-    let has_yaku =
-        !regular_yaku.is_empty() || player.is_riichi || player.is_daburu_riichi;
+    let has_yaku = !regular_yaku.is_empty() || player.is_riichi || player.is_daburu_riichi;
 
     let mut num_akadora_to_add = 0;
 
@@ -92,6 +92,8 @@ pub fn check_all_yaku(
     })
 }
 
+// ---Yakuman Checkers---
+
 fn check_game_state_yakuman(_player: &PlayerContext, game: &GameContext) -> Vec<Yaku> {
     let mut yaku = Vec::new();
     if game.is_tenhou {
@@ -106,7 +108,6 @@ fn check_game_state_yakuman(_player: &PlayerContext, game: &GameContext) -> Vec<
     yaku
 }
 
-/// Find hand-based Yakuman
 fn resolve_hand_structure(
     org: HandOrganization,
     player: &PlayerContext,
@@ -130,11 +131,11 @@ fn resolve_hand_structure(
             Ok((structure, yakuman_list))
         }
         HandOrganization::Irregular { counts, agari_hai } => {
-            // Kokushi 
+            // Kokushi
             if let Some((kokushi_structure, kokushi_yaku)) = check_kokushi(&counts, agari_hai) {
                 Ok((kokushi_structure, vec![kokushi_yaku]))
             }
-            // Chiitoitsu 
+            // Chiitoitsu
             else if let Some(chiitoitsu_structure) = check_chiitoitsu(&counts, agari_hai) {
                 let yakuman = check_chiitoitsu_yakuman(&chiitoitsu_structure);
                 Ok((chiitoitsu_structure, yakuman))
@@ -148,13 +149,13 @@ fn resolve_hand_structure(
 fn check_standard_yakuman(
     hand: &AgariHand,
     _player: &PlayerContext,
-    _game: &GameContext, 
+    _game: &GameContext,
     agari_type: AgariType,
 ) -> (Vec<Yaku>, Option<bool>) {
     let mut yakuman = Vec::new();
     let all_tiles = get_all_tiles(hand);
 
-    // Tile-based Yakuman 
+    // Tile-based Yakuman
     let mut is_tsuuiisou = true;
     let mut is_chinroutou = true;
     let mut is_ryuuiisou = true;
@@ -181,16 +182,16 @@ fn check_standard_yakuman(
         yakuman.push(Yaku::Ryuuiisou);
     }
 
-    //  Meld-based Yakuman 
+    //  Meld-based Yakuman
     let (_koutsu, kantsu) = count_koutsu_kantsu(hand);
     let concealed_koutsu = count_concealed_koutsu(hand, agari_type);
 
-    // Suukantsu 
+    // Suukantsu
     if kantsu == 4 {
         yakuman.push(Yaku::Suukantsu);
     }
 
-    // Suuankou 
+    // Suuankou
     if concealed_koutsu == 4 {
         if hand.machi == Machi::Tanki {
             yakuman.push(Yaku::SuuankouTanki);
@@ -212,7 +213,7 @@ fn check_standard_yakuman(
         yakuman.push(Yaku::Daisangen);
     }
 
-    // Daisuushi / Shousuushi 
+    // Daisuushi / Shousuushi
     let mut wind_koutsu = 0;
     let mut wind_atama = false;
     for mentsu in &hand.mentsu {
@@ -232,7 +233,7 @@ fn check_standard_yakuman(
         yakuman.push(Yaku::Shousuushi);
     }
 
-    // Chuuren Poutou 
+    // Chuuren Poutou
     let chuuren_flag = check_chuuren(hand);
     if let Some(is_junsei) = chuuren_flag {
         if is_junsei {
@@ -245,7 +246,7 @@ fn check_standard_yakuman(
     (yakuman, chuuren_flag)
 }
 
-/// Kokushi Musou 
+/// Kokushi Musou
 fn check_kokushi(counts: &[u8; 34], agari_hai: Hai) -> Option<(HandStructure, Yaku)> {
     let mut has_pair = false;
     let mut tiles = Vec::new();
@@ -255,7 +256,7 @@ fn check_kokushi(counts: &[u8; 34], agari_hai: Hai) -> Option<(HandStructure, Ya
         let tile = index_to_tile(idx);
         if !tile.is_yaochuu() {
             if count > 0 {
-                return None; 
+                return None;
             }
             continue;
         }
@@ -267,14 +268,13 @@ fn check_kokushi(counts: &[u8; 34], agari_hai: Hai) -> Option<(HandStructure, Ya
             2 => {
                 if has_pair {
                     return None;
-                } 
+                }
                 has_pair = true;
                 atama_tile = Some(tile);
-                tiles.push(tile); 
+                tiles.push(tile);
             }
-            0 => {
-            }
-            _ => return None, 
+            0 => {}
+            _ => return None,
         }
     }
 
@@ -284,12 +284,12 @@ fn check_kokushi(counts: &[u8; 34], agari_hai: Hai) -> Option<(HandStructure, Ya
 
     let agari_hai_index = tile_to_index(&agari_hai);
     if counts[agari_hai_index] == 0 {
-        return None; 
+        return None;
     }
 
     let atama = (atama_tile.unwrap(), atama_tile.unwrap());
 
-    // 13-sided wait 
+    // 13-sided wait
     let mut yaku = Yaku::KokushiMusou;
     let mut final_machi = Machi::KokushiIchimen;
 
@@ -327,7 +327,7 @@ fn check_chiitoitsu(counts: &[u8; 34], agari_hai: Hai) -> Option<HandStructure> 
                 pairs.push((tile, tile));
                 pairs.push((tile, tile));
             } else {
-                return None; 
+                return None;
             }
         }
     }
@@ -336,7 +336,7 @@ fn check_chiitoitsu(counts: &[u8; 34], agari_hai: Hai) -> Option<HandStructure> 
         Some(HandStructure::Chiitoitsu {
             pairs: pairs.try_into().ok()?,
             agari_hai,
-            machi: Machi::Tanki, 
+            machi: Machi::Tanki,
         })
     } else {
         None
@@ -360,7 +360,7 @@ fn check_chiitoitsu_yakuman(hand: &HandStructure) -> Vec<Yaku> {
     vec![]
 }
 
-/// Chuuren Poutou 
+/// Chuuren Poutou
 fn check_chuuren(hand: &AgariHand) -> Option<bool> {
     let all_tiles = get_all_tiles(hand);
 
@@ -368,7 +368,7 @@ fn check_chuuren(hand: &AgariHand) -> Option<bool> {
     if !is_chinitsu {
         return None;
     }
-    let suit = suit.unwrap(); 
+    let suit = suit.unwrap();
 
     if !hand.mentsu.iter().all(|m| !m.is_minchou) {
         return None;
@@ -396,24 +396,24 @@ fn check_chuuren(hand: &AgariHand) -> Option<bool> {
         if count == required_count + 1 {
             if has_extra {
                 return None;
-            } 
+            }
             has_extra = true;
             extra_tile_num = num;
         } else if count > required_count + 1 {
-            return None; 
+            return None;
         }
     }
 
     if !has_extra {
         return None;
-    } 
+    }
     if let Hai::Suhai(n, s) = hand.agari_hai {
         if s == suit && n as usize == extra_tile_num {
             return Some(true);
         }
     }
 
-    Some(false) 
+    Some(false)
 }
 
 /// Double Yakuman overrides
@@ -431,7 +431,7 @@ fn post_process_yakuman(mut yakuman: Vec<Yaku>) -> Vec<Yaku> {
     yakuman
 }
 
-// Regular Yaku
+// ---General Yaku Checkers---
 
 fn find_standard_yaku(
     hand: &AgariHand,
@@ -441,7 +441,7 @@ fn find_standard_yaku(
 ) -> Vec<Yaku> {
     let mut yaku_list = Vec::new();
 
-    // State-based Yaku 
+    // State-based Yaku
     if player.is_daburu_riichi {
         yaku_list.push(Yaku::DaburuRiichi);
     } else if player.is_riichi {
@@ -466,10 +466,10 @@ fn find_standard_yaku(
         yaku_list.push(Yaku::Chankan);
     }
 
-    // Yakuhai 
+    // Yakuhai
     yaku_list.extend(check_yakuhai(hand, player, game));
 
-    // Pinfu 
+    // Pinfu
     if check_pinfu(hand, player, game) {
         yaku_list.push(Yaku::Pinfu);
     }
@@ -479,7 +479,7 @@ fn find_standard_yaku(
         yaku_list.push(Yaku::Tanyao);
     }
 
-    //  Sequence Yaku 
+    //  Sequence Yaku
     let shuntsu: Vec<&Mentsu> = hand
         .mentsu
         .iter()
@@ -527,12 +527,12 @@ fn find_standard_yaku(
         yaku_list.push(Yaku::Shousangen);
     }
 
-    //  Terminal/Honor Yaku 
+    //  Terminal/Honor Yaku
     let all_tiles = get_all_tiles(hand);
     let all_groups = get_all_groups(hand);
 
-    let is_honroutou = all_tiles.iter().all(|t| t.is_yaochuu())
-        && !all_tiles.iter().all(|t| t.is_terminal()); // Exclude Chinroutou
+    let is_honroutou =
+        all_tiles.iter().all(|t| t.is_yaochuu()) && !all_tiles.iter().all(|t| t.is_terminal()); // Exclude Chinroutou
 
     if is_honroutou {
         yaku_list.push(Yaku::Honroutou);
@@ -545,7 +545,7 @@ fn find_standard_yaku(
         }
     }
 
-    //  Color Yaku 
+    //  Color Yaku
     let (is_chinitsu, _) = check_chinitsu(&all_tiles);
     if is_chinitsu {
         yaku_list.push(Yaku::Chinitsu);
@@ -557,9 +557,7 @@ fn find_standard_yaku(
     }
 
     if yaku_list.contains(&Yaku::Pinfu) {
-        if yaku_list.contains(&Yaku::RinshanKaihou)
-            || yaku_list.contains(&Yaku::Chankan)
-        {
+        if yaku_list.contains(&Yaku::RinshanKaihou) || yaku_list.contains(&Yaku::Chankan) {
             yaku_list.retain(|&y| y != Yaku::Pinfu);
         }
     }
@@ -600,19 +598,19 @@ fn find_chiitoitsu_yaku(
         yaku_list.push(Yaku::HouteiRaoyui);
     }
 
-    // Tile-based Yaku 
+    // Tile-based Yaku
     let all_tiles: Vec<Hai> = pairs.iter().flat_map(|&(t1, t2)| vec![t1, t2]).collect();
 
     if all_tiles.iter().all(|t| t.is_simple()) {
         yaku_list.push(Yaku::Tanyao);
     }
 
-    // Honroutou 
+    // Honroutou
     if all_tiles.iter().all(|t| t.is_yaochuu()) {
         yaku_list.push(Yaku::Honroutou);
     }
 
-    // Color Yaku 
+    // Color Yaku
     let (is_chinitsu, _) = check_chinitsu(&all_tiles);
     if is_chinitsu {
         yaku_list.push(Yaku::Chinitsu);
@@ -626,7 +624,7 @@ fn find_chiitoitsu_yaku(
     yaku_list
 }
 
-//  Dora
+// ---Specific Yaku Checkers---
 
 fn count_dora(all_tiles: &[Hai], indicators: &[Hai]) -> u8 {
     let mut count = 0;
@@ -664,13 +662,7 @@ fn get_dora_tile(indicator: &Hai) -> Hai {
     }
 }
 
-//  Helper Functions 
-
-fn check_yakuhai(
-    hand: &AgariHand,
-    player: &PlayerContext,
-    game: &GameContext,
-) -> Vec<Yaku> {
+fn check_yakuhai(hand: &AgariHand, player: &PlayerContext, game: &GameContext) -> Vec<Yaku> {
     let mut yaku = Vec::new();
 
     let koutsu_tiles: HashSet<Hai> = hand
@@ -883,7 +875,7 @@ fn check_chanta_junchan(groups: &[Vec<Hai>]) -> (bool, bool) {
         }
 
         if has_jihai {
-            is_junchan = false; 
+            is_junchan = false;
         }
     }
 
@@ -921,7 +913,7 @@ fn check_color(all_tiles: &[Hai]) -> (bool, bool, Option<Suhai>) {
 
     if !has_jihai {
         is_honitsu = false;
-    } 
+    }
 
     (is_honitsu, is_chinitsu, suit)
 }
@@ -930,6 +922,7 @@ fn check_honitsu(all_tiles: &[Hai]) -> (bool, Option<Suhai>) {
     let (hon, _chin, suit) = check_color(all_tiles);
     (hon, suit)
 }
+
 fn check_chinitsu(all_tiles: &[Hai]) -> (bool, Option<Suhai>) {
     let (_hon, chin, suit) = check_color(all_tiles);
     (chin, suit)
@@ -960,7 +953,7 @@ fn get_all_tiles_from_structure(structure: &HandStructure) -> Vec<Hai> {
         }
         HandStructure::KokushiMusou { tiles, atama, .. } => {
             let mut v = tiles.to_vec();
-            v.push(atama.0); 
+            v.push(atama.0);
             v
         }
         HandStructure::ChuurenPoutou { hand, .. } => get_all_tiles(hand),
@@ -1001,7 +994,7 @@ fn count_concealed_koutsu(hand: &AgariHand, agari_type: AgariType) -> u8 {
     for m in &hand.mentsu {
         if m.is_minchou {
             continue;
-        } 
+        }
 
         if m.mentsu_type == MentsuType::Koutsu {
             if agari_type == AgariType::Ron {
@@ -1011,7 +1004,7 @@ fn count_concealed_koutsu(hand: &AgariHand, agari_type: AgariType) -> u8 {
             }
             count += 1;
         } else if m.mentsu_type == MentsuType::Kantsu {
-            count += 1; 
+            count += 1;
         }
     }
     count
@@ -1023,9 +1016,7 @@ fn is_koutsu_or_kantsu(mentsu: &Mentsu) -> bool {
 
 fn is_green_tile(tile: &Hai) -> bool {
     match tile {
-        Hai::Suhai(n, Suhai::Souzu) => {
-            *n == 2 || *n == 3 || *n == 4 || *n == 6 || *n == 8
-        }
+        Hai::Suhai(n, Suhai::Souzu) => *n == 2 || *n == 3 || *n == 4 || *n == 6 || *n == 8,
         Hai::Jihai(Jihai::Sangen(Sangenpai::Hatsu)) => true,
         _ => false,
     }

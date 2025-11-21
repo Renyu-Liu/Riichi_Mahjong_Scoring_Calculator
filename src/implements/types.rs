@@ -2,7 +2,6 @@
 
 pub mod tiles {
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-    // Represents the three numbered suits.
     pub enum Suhai {
         // 数牌 (Numbered Tiles)
         Manzu, // 萬子 (Characters)
@@ -11,7 +10,6 @@ pub mod tiles {
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-    // Represents the four wind directions.
     pub enum Kaze {
         // 風牌 (Wind Tiles)
         Ton,  // 東 (East)
@@ -21,7 +19,6 @@ pub mod tiles {
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-    // Represents the three dragons.
     pub enum Sangenpai {
         // 三元牌 (Dragon Tiles)
         Haku,  // 白 (White)
@@ -30,7 +27,6 @@ pub mod tiles {
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-    // Represents any honor tile (Wind or Dragon).
     pub enum Jihai {
         // 字牌 (Honor Tiles)
         Kaze(Kaze),
@@ -38,7 +34,6 @@ pub mod tiles {
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-    // Represents a single Mahjong tile.
     pub enum Hai {
         // 牌 (Tile)
         Suhai(u8, Suhai), // 数牌 (Numbered tile, 1-9)
@@ -46,7 +41,7 @@ pub mod tiles {
     }
 
     impl Hai {
-        // simple (2-8 suhai)?
+        // simple (2-8 suhai)
         pub fn is_simple(&self) -> bool {
             match self {
                 Hai::Suhai(n, _) => *n >= 2 && *n <= 8,
@@ -54,7 +49,7 @@ pub mod tiles {
             }
         }
 
-        // terminal (1 or 9)?
+        // terminal (1 or 9)
         pub fn is_terminal(&self) -> bool {
             match self {
                 Hai::Suhai(n, _) => *n == 1 || *n == 9,
@@ -62,12 +57,12 @@ pub mod tiles {
             }
         }
 
-        // honor tile (wind or dragon)?
+        // honor tile (wind or dragon)
         pub fn is_jihai(&self) -> bool {
             matches!(self, Hai::Jihai(_))
         }
 
-        // terminal or honor (yaochuu-hai)?
+        // terminal or honor (yaochuu-hai)
         pub fn is_yaochuu(&self) -> bool {
             self.is_terminal() || self.is_jihai()
         }
@@ -111,8 +106,8 @@ pub mod hand {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum MentsuType {
         Shuntsu, // 順子 (Sequence)
-        Koutsu, // 刻子 (Triplet)
-        Kantsu, // 槓子 (Kan/Quad)
+        Koutsu,  // 刻子 (Triplet)
+        Kantsu,  // 槓子 (Kan/Quad)
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -120,7 +115,7 @@ pub mod hand {
         // 面子 (Meld)
         pub mentsu_type: MentsuType,
         pub is_minchou: bool, // 明張 (meld open?)
-        pub tiles: [Hai; 4],  
+        pub tiles: [Hai; 4],
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -158,7 +153,6 @@ pub mod hand {
 
     #[derive(Debug, Clone)]
     pub enum HandStructure {
-        // 四面子一頭 (Standard 4 melds, 1 pair)
         YonmentsuIchiatama(AgariHand),
 
         // 七対子 (Seven Pairs)
@@ -170,10 +164,10 @@ pub mod hand {
 
         // 国士無双 (Thirteen Orphans)
         KokushiMusou {
-            tiles: [Hai; 13],  
-            atama: (Hai, Hai), 
-            _agari_hai: Hai, 
-            _machi: Machi, 
+            tiles: [Hai; 13],
+            atama: (Hai, Hai),
+            _agari_hai: Hai,
+            _machi: Machi,
         },
 
         // 九蓮宝燈 (Nine Gates)
@@ -206,7 +200,7 @@ pub mod game {
     }
 
     #[derive(Debug, Clone)]
-    // Context for the current round 
+    // Context for the current round
     pub struct GameContext {
         pub bakaze: Kaze, // 場風 (Prevalent Wind)
         #[allow(dead_code)]
@@ -270,19 +264,19 @@ pub mod yaku {
         Chinitsu, // 清一色 (Full Flush) kuisagari
 
         // Yakuman (13 Han)
-        Tenhou,        // 天和 (Blessing of Heaven)
-        Chiihou,       // 地和 (Blessing of Earth)
-        Renhou,        // 人和 (Blessing of Man)
-        Daisangen,     // 大三元 (Big Three Dragons)
-        Suuankou,      // 四暗刻 (Four Concealed Triplets)
-        Daisuushi,     // 大四喜 (Four Big Winds)
-        Shousuushi,    // 小四喜 (Four Little Winds)
-        Tsuuiisou,     // 字一色 (All Honors)
-        Chinroutou,    // 清老頭 (All Terminals)
-        Ryuuiisou,     // 緑一色 (All Green)
-        Suukantsu,     // 四槓子 (Four Quads)
-        KokushiMusou,  // 国士無双 (Thirteen Orphans)
-        ChuurenPoutou, // 九蓮宝燈 (Nine Gates)
+        Tenhou,               // 天和 (Blessing of Heaven)
+        Chiihou,              // 地和 (Blessing of Earth)
+        Renhou,               // 人和 (Blessing of Man)
+        Daisangen,            // 大三元 (Big Three Dragons)
+        Suuankou,             // 四暗刻 (Four Concealed Triplets)
+        Daisuushi,            // 大四喜 (Four Big Winds)
+        Shousuushi,           // 小四喜 (Four Little Winds)
+        Tsuuiisou,            // 字一色 (All Honors)
+        Chinroutou,           // 清老頭 (All Terminals)
+        Ryuuiisou,            // 緑一色 (All Green)
+        Suukantsu,            // 四槓子 (Four Quads)
+        KokushiMusou,         // 国士無双 (Thirteen Orphans)
+        ChuurenPoutou,        // 九蓮宝燈 (Nine Gates)
         SuuankouTanki,        // 四暗刻単騎 (Single Wait Four Concealed)
         KokushiMusouJusanmen, // 国士無S双13面待ち (13-Sided Wait Kokushi)
         JunseiChuurenPoutou,  // 純正九蓮宝燈 (True Nine Gates)
@@ -302,9 +296,9 @@ pub mod yaku {
 }
 
 pub mod scoring {
-    use std::fmt;
     use super::game::AgariType;
     use super::yaku::Yaku;
+    use std::fmt;
 
     #[derive(Debug, Clone, PartialEq, Eq)]
     // named point limits
@@ -330,7 +324,7 @@ pub mod scoring {
         pub fu: u8,               // 符 (Fu count)
         pub yaku_list: Vec<Yaku>, // List of all yaku and dora achieved
         #[allow(dead_code)]
-        pub num_akadora: u8,      // 赤ドラ (Red Dora)
+        pub num_akadora: u8, // 赤ドラ (Red Dora)
         // The named limit
         pub limit_name: Option<HandLimit>,
 
@@ -477,10 +471,10 @@ pub mod input {
 
         pub winning_tile: Hai,
 
-        // list of all open melds 
+        // list of all open melds
         pub open_melds: Vec<OpenMeldInput>,
 
-        // list of all closed kans 
+        // list of all closed kans
         pub closed_kans: Vec<Hai>,
 
         pub player_context: PlayerContext,
