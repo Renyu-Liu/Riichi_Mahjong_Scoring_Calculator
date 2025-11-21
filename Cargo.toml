@@ -1,0 +1,7 @@
+[package]
+name = "Riichi_Mahjong_Scoring_Calculator"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+iced = { version = "0.12.1", features = ["image"] }

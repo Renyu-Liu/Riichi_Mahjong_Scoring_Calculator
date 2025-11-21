@@ -1,0 +1,12 @@
+/Users/renyuliu/Documents/GitHub/Riichi_Mahjong_Scoring_Calculator/target/debug/deps/iced-a0b94783a922f326.d: /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/lib.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/error.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/sandbox.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/application.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/settings.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/time.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/window.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/window/icon.rs
+
+/Users/renyuliu/Documents/GitHub/Riichi_Mahjong_Scoring_Calculator/target/debug/deps/libiced-a0b94783a922f326.rmeta: /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/lib.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/error.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/sandbox.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/application.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/settings.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/time.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/window.rs /Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/window/icon.rs
+
+/Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/lib.rs:
+/Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/error.rs:
+/Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/sandbox.rs:
+/Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/application.rs:
+/Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/settings.rs:
+/Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/time.rs:
+/Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/window.rs:
+/Users/renyuliu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iced-0.12.1/src/window/icon.rs:
