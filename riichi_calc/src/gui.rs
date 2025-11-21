@@ -1,3 +1,5 @@
+// gui.rs: Iced GUI
+
 use crate::implements::calculate_agari;
 use crate::implements::game::{AgariType, GameContext, PlayerContext};
 use crate::implements::hand::MentsuType;
@@ -12,8 +14,9 @@ pub fn run() -> iced::Result {
 
 #[derive(Debug, Clone)]
 pub enum Message {
+    // Phase 1 Messages
     AddTile(Hai),
-    RemoveTile(usize), // Index in hand
+    RemoveTile(usize), 
     ConfirmHand,
     ModifyHand,
     // Phase 2 Messages
@@ -21,16 +24,15 @@ pub enum Message {
     SelectWinningTile(Hai),
     StartAddOpenMeld,
     SelectMeldType(MentsuType),
-    SelectMeldTile(Hai), // For Open Meld
+    SelectMeldTile(Hai), 
     StartAddClosedKan,
     SelectClosedKan(Hai),
-    // Edit/Remove Melds
     EditOpenMeld(usize),
     EditClosedKan(usize),
     RemoveOpenMeld(usize),
     RemoveClosedKan(usize),
     // Phase 3 Messages
-    ToggleAgariType(AgariType), // Ron/Tsumo
+    ToggleAgariType(AgariType), 
     SetBakaze(Kaze),
     SetJikaze(Kaze),
     ToggleRiichi(bool),
@@ -57,10 +59,9 @@ pub enum Message {
 enum Phase {
     Composition,
     Definition,
-    // "Modals"
     SelectingWinningTile,
     SelectingMeldType { editing_index: Option<usize> },
-    SelectingMeldTile(MentsuType, Option<usize>), // type, editing_index
+    SelectingMeldTile(MentsuType, Option<usize>), 
     SelectingClosedKan { editing_index: Option<usize> },
     SelectingDora,
     SelectingUraDora,
@@ -69,10 +70,9 @@ enum Phase {
 
 struct RiichiGui {
     phase: Phase,
+
+    // Phase 1 State
     hand_tiles: Vec<Hai>,
-    // Count of each tile in the pool (34 types, max 4 each)
-    // Index mapping: Manzu 1-9 (0-8), Pinzu 1-9 (9-17), Souzu 1-9 (18-26),
-    // Ton, Nan, Shaa, Pei (27-30), Haku, Hatsu, Chun (31-33)
     tile_counts: [u8; 34],
 
     // Phase 2 State
@@ -98,7 +98,6 @@ struct RiichiGui {
     dora_indicators: Vec<Hai>,
     uradora_indicators: Vec<Hai>,
 
-    // Result
     score_result: Option<Result<crate::implements::scoring::AgariResult, String>>,
 }
 
@@ -109,7 +108,7 @@ impl Sandbox for RiichiGui {
         Self {
             phase: Phase::Composition,
             hand_tiles: Vec::new(),
-            tile_counts: [4; 34], // Start with 4 of each tile
+            tile_counts: [4; 34], 
             winning_tile: None,
             open_melds: Vec::new(),
             closed_kans: Vec::new(),
@@ -145,7 +144,7 @@ impl Sandbox for RiichiGui {
                     if self.tile_counts[idx] > 0 {
                         self.tile_counts[idx] -= 1;
                         self.hand_tiles.push(tile);
-                        self.hand_tiles.sort(); // Keep hand sorted
+                        self.hand_tiles.sort(); 
                     }
                 }
             }
@@ -163,11 +162,9 @@ impl Sandbox for RiichiGui {
             }
             Message::ModifyHand => {
                 self.phase = Phase::Composition;
-                // Reset dependent state here (winning tile, melds, etc.)
                 self.winning_tile = None;
                 self.open_melds.clear();
                 self.closed_kans.clear();
-                // Reset context? Maybe keep it.
             }
             Message::StartSelectWinningTile => {
                 self.phase = Phase::SelectingWinningTile;
@@ -203,7 +200,6 @@ impl Sandbox for RiichiGui {
                         self.open_melds.push(meld);
                     }
 
-                    // Clear Menzen-only flags if we have open melds
                     if !self.open_melds.is_empty() {
                         self.is_riichi = false;
                         self.is_daburu_riichi = false;
@@ -238,8 +234,6 @@ impl Sandbox for RiichiGui {
             }
             Message::EditOpenMeld(idx) => {
                 if idx < self.open_melds.len() {
-                    // When editing, we start from selecting type again? Or just tile?
-                    // Let's start from selecting type to be flexible.
                     self.phase = Phase::SelectingMeldType {
                         editing_index: Some(idx),
                     };
@@ -264,19 +258,17 @@ impl Sandbox for RiichiGui {
             }
             Message::ToggleAgariType(agari_type) => {
                 self.agari_type = agari_type;
-                // Reset incompatible yaku
                 match self.agari_type {
                     AgariType::Ron => {
-                        self.is_tenhou = false; // Tenhou is Tsumo only
-                        self.is_chiihou = false; // Chiihou is Tsumo only
-                        self.is_haitei = false; // Haitei is Tsumo
-                        self.is_rinshan = false; // Rinshan is Tsumo
-                        // Renhou is Ron, so it stays (if menzen)
+                        self.is_tenhou = false; 
+                        self.is_chiihou = false; 
+                        self.is_haitei = false; 
+                        self.is_rinshan = false; 
                     }
                     AgariType::Tsumo => {
-                        self.is_renhou = false; // Renhou is Ron
-                        self.is_houtei = false; // Houtei is Ron
-                        self.is_chankan = false; // Chankan is Ron
+                        self.is_renhou = false; 
+                        self.is_houtei = false; 
+                        self.is_chankan = false; 
                     }
                 }
             }
@@ -285,11 +277,9 @@ impl Sandbox for RiichiGui {
             }
             Message::SetJikaze(kaze) => {
                 self.jikaze = kaze;
-                // If not Oya, Tenhou is impossible
                 if self.jikaze != Kaze::Ton {
                     self.is_tenhou = false;
                 } else {
-                    // If Oya, Chiihou is impossible
                     self.is_chiihou = false;
                 }
             }
@@ -335,7 +325,7 @@ impl Sandbox for RiichiGui {
                 self.phase = Phase::Definition;
             }
             Message::CalculateScore => {
-                // Construct UserInput
+                // UserInput
                 if let Some(winning_tile) = self.winning_tile {
                     let input = UserInput {
                         hand_tiles: self.hand_tiles.clone(),
@@ -353,12 +343,12 @@ impl Sandbox for RiichiGui {
                         },
                         game_context: GameContext {
                             bakaze: self.bakaze,
-                            kyoku: 1, // Default
+                            kyoku: 1, 
                             honba: self.honba,
-                            riichi_bou: if self.is_riichi { 1 } else { 0 }, // Simplified
+                            riichi_bou: if self.is_riichi { 1 } else { 0 }, 
                             dora_indicators: self.dora_indicators.clone(),
                             uradora_indicators: self.uradora_indicators.clone(),
-                            num_akadora: 0, // Not implemented yet
+                            num_akadora: 0, 
                             is_tenhou: self.is_tenhou,
                             is_chiihou: self.is_chiihou,
                             is_renhou: self.is_renhou,
@@ -380,7 +370,7 @@ impl Sandbox for RiichiGui {
                     self.phase = Phase::Result;
                 } else {
                     self.score_result = Some(Err("Please select a winning tile.".to_string()));
-                    self.phase = Phase::Result; // Or stay in Definition and show error
+                    self.phase = Phase::Result; 
                 }
             }
             Message::StartOver => {
@@ -418,9 +408,9 @@ impl RiichiGui {
 
         let tile_count = self.hand_tiles.len();
         let counter_color = if tile_count < 14 {
-            Color::from_rgb(0.8, 0.0, 0.0) // Red
+            Color::from_rgb(0.8, 0.0, 0.0) 
         } else {
-            Color::from_rgb(0.0, 0.5, 0.0) // Green
+            Color::from_rgb(0.0, 0.5, 0.0) 
         };
 
         let counter_text = text(format!("Your Hand ({}/18 tiles)", tile_count))
@@ -496,10 +486,6 @@ impl RiichiGui {
                     .iter()
                     .enumerate()
                     .map(|(i, k)| {
-                        // Closed kan: 4 tiles. Usually 2 face down, 2 face up, or all face down?
-                        // For simplicity, show 4 tiles of the type.
-                        // Or maybe show back of tile?
-                        // Let's show 4 tiles of the type for clarity in this calculator.
                         let tiles = vec![*k; 4];
                         let tile_images = row(tiles
                             .iter()
@@ -536,7 +522,7 @@ impl RiichiGui {
         let is_tsumo = self.agari_type == AgariType::Tsumo;
         let is_menzen = self.open_melds.is_empty();
 
-        // Helper for checkboxes with conflict logic
+        // conflicts
         let checkbox_with_conflict = |label: &str,
                                       is_checked: bool,
                                       msg: fn(bool) -> Message,
@@ -546,8 +532,8 @@ impl RiichiGui {
                 checkbox(label, is_checked).on_toggle(msg).into()
             } else {
                 row![
-                    checkbox("", is_checked),                          // Read-only, no on_toggle
-                    text(label).style(Color::from_rgb(0.5, 0.5, 0.5))  // Grey text
+                    checkbox("", is_checked),                          
+                    text(label).style(Color::from_rgb(0.5, 0.5, 0.5)) 
                 ]
                 .spacing(0)
                 .align_items(iced::Alignment::Center)
@@ -675,7 +661,6 @@ impl RiichiGui {
                     .collect::<Vec<Element<Message>>>())
                 .spacing(5),
                 button(text("Add Dora")).on_press(Message::StartAddDora),
-                // Ura Dora only if Riichi
                 if self.is_riichi {
                     column![
                         text("Ura Dora Indicators:"),
@@ -732,19 +717,13 @@ impl RiichiGui {
                     ..
                 } = result;
 
-                // Check for valid yaku (excluding Dora types)
+                // Check valid yaku
                 let valid_yaku_count = yaku_list
                     .iter()
                     .filter(|y| !matches!(y, Yaku::Dora | Yaku::UraDora | Yaku::AkaDora))
                     .count();
 
                 if valid_yaku_count == 0 && limit_name.is_none() {
-                    // No Yaku and not a Yakuman (Yakuman is a yaku, but handled via limit_name usually,
-                    // though Yakuman yaku should be in yaku_list too.
-                    // Let's trust yaku_list contains Yakuman yaku if present.
-                    // Wait, Yakuman yaku ARE in yaku_list.
-                    // So valid_yaku_count == 0 is sufficient check.
-
                     column![
                         text("No Yaku Found")
                             .size(30)
@@ -757,17 +736,17 @@ impl RiichiGui {
                     .spacing(15)
                     .align_items(iced::Alignment::Center)
                 } else {
-                    // 1. Header
+                    // Header
                     let header = text("Calculation Result")
                         .size(30)
                         .style(Color::from_rgb(0.0, 0.0, 0.0));
 
-                    // 2. Total Score
+                    // Total Score
                     let score_text = text(format!("{} Points", total_payment))
                         .size(40)
                         .style(Color::from_rgb(0.8, 0.2, 0.2)); // Accent color
 
-                    // 3. Limit Name (if any)
+                    // Limit Name (if any)
                     let limit_text = if let Some(limit) = limit_name {
                         let limit_str = match limit {
                             HandLimit::Mangan => "Mangan",
@@ -783,15 +762,14 @@ impl RiichiGui {
                         text("")
                     };
 
-                    // 4. Han / Fu
+                    // Han / Fu
                     let han_fu_text = if limit_name.as_ref() == Some(&HandLimit::Yakuman) {
-                        // Yakuman doesn't usually show Han/Fu in the same way
                         text(format!("{} Han", han)).size(20)
                     } else {
                         text(format!("{} Han / {} Fu", han, fu)).size(20)
                     };
 
-                    // 5. Yaku List
+                    // Yaku List
                     let mut yaku_col =
                         column![text("Yaku:").size(18).style(Color::from_rgb(0.3, 0.3, 0.3))];
                     let mut dora_count = 0;
@@ -821,7 +799,7 @@ impl RiichiGui {
                             yaku_col.push(text(format!("• Aka Dora x{}", akadora_count)).size(18));
                     }
 
-                    // 6. Payment Detail
+                    // Payment Detail
                     let tsumo_bonus = *honba as u32 * 100;
                     let ron_bonus = *honba as u32 * 300;
 
@@ -1008,9 +986,6 @@ impl RiichiGui {
     }
 
     fn view_selecting_dora(&self, is_ura: bool) -> Element<'_, Message> {
-        // Show all tiles as potential dora
-        // Or just all 34 tiles?
-        // Usually dora can be any tile.
 
         let mut tiles = Vec::new();
 
@@ -1108,35 +1083,11 @@ impl RiichiGui {
         let mut tiles = Vec::new();
         match meld.mentsu_type {
             MentsuType::Shuntsu => {
-                // Shuntsu: 3 sequential tiles.
-                // We need to find the "start" tile.
-                // Assuming representative_tile is the lowest tile? Or the one called?
-                // Usually Shuntsu is defined by the lowest tile.
-                // Let's assume representative_tile is the lowest.
-                // Wait, if I select 5, it could be 3-4-5, 4-5-6, 5-6-7.
-                // The current input just takes one tile.
-                // Let's assume it starts with that tile for now (e.g. 3-4-5).
-                // But we need to handle wrapping or invalid sequences if we were validating.
-                // For display, let's just show tile, tile+1, tile+2.
 
                 let start_idx = crate::implements::tiles::tile_to_index(&meld.representative_tile);
-                // Check if it's a valid suit tile
                 if start_idx < 27 {
-                    // Suhai only
-                    // Ensure we don't go out of bounds of the suit (e.g. 9)
-                    // Actually, if user selects 9, we can't make a sequence starting at 9.
-                    // But for display, let's just try.
-
-                    // Logic:
-                    // Manzu: 0-8
-                    // Pinzu: 9-17
-                    // Souzu: 18-26
 
                     let suit_base = (start_idx / 9) * 9;
-
-                    // If val is 7 (8), 7-8-9. If val is 8 (9), invalid?
-                    // Let's just clamp or wrap? No, clamp.
-                    // Actually, let's just show 3 tiles starting from there.
 
                     for i in 0..3 {
                         let idx = start_idx + i;
@@ -1145,7 +1096,6 @@ impl RiichiGui {
                         }
                     }
                 } else {
-                    // Jihai cannot form Shuntsu
                     tiles.push(meld.representative_tile);
                 }
             }
@@ -1191,7 +1141,6 @@ fn get_tile_image_path(tile: &Hai) -> String {
         Hai::Jihai(Jihai::Sangen(Sangenpai::Hatsu)) => "Hatsu.png".to_string(),
         Hai::Jihai(Jihai::Sangen(Sangenpai::Chun)) => "Chun.png".to_string(),
     };
-    // Assuming running from project root
     format!("tiles_image/Regular/{}", filename)
 }
 
