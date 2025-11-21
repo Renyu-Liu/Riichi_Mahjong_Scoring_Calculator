@@ -1,8 +1,10 @@
-CS 128H Group 12 Project
+Todo list:
 
-Worked with help from Google Gemini
+1: the whole program is way too large (1.5GB). Delete unnecessary files
 
-Group member names and NetIDs: Thomas (tj29) Karan (annam17) Renyu (renyul2) 
+2: make the program runnable on Windows
+
+3: Improve GUI
 
 # Project Name: Riichi Mahjong Score Calculator
 
@@ -29,3 +31,9 @@ todo
 ## Output
 
 todo
+
+CS 128H Group 12 Project
+
+Worked with help from Google Gemini
+
+Group member names and NetIDs: Thomas (tj29) Karan (annam17) Renyu (renyul2) 
