@@ -1,156 +1,12 @@
 // raw_hand_organizer.rs: Organizes a raw hand input into standard melds and pair
 
 use super::types::{
-    game::{AgariType, GameContext, PlayerContext},
+    game::AgariType,
     hand::{AgariHand, HandOrganization, Machi, Mentsu, MentsuType},
     input::UserInput,
-    // Import centralized helper functions
-    tiles::{Hai, Suhai, index_to_tile, tile_to_index},
+    tiles::{Hai, index_to_tile, tile_to_index},
 };
 use std::convert::TryInto;
-
-// Input Validation Module
-mod input_validator {
-    use super::*;
-
-    /// logical conflicts
-    fn validate_game_state(
-        p: &PlayerContext,
-        g: &GameContext,
-        a: AgariType,
-        input: &UserInput,
-    ) -> Result<(), &'static str> {
-        // Riichi conflicts
-        if p.is_daburu_riichi && p.is_riichi {
-            return Err("Invalid state: Cannot be both Riichi and Daburu Riichi.");
-        }
-        if p.is_ippatsu && !(p.is_riichi || p.is_daburu_riichi) {
-            return Err("Invalid state: Ippatsu requires Riichi or Daburu Riichi.");
-        }
-
-        // Menzen (Concealed) conflicts
-        if p.is_menzen && !input.open_melds.is_empty() {
-            return Err("Invalid state: Hand is declared menzen but has open melds.");
-        }
-
-        // Tsumo/Ron conflicts
-        if g.is_haitei && a == AgariType::Ron {
-            return Err("Invalid state: Haitei (last draw) cannot be a Ron win.");
-        }
-        if g.is_houtei && a == AgariType::Tsumo {
-            return Err("Invalid state: Houtei (last discard) cannot be a Tsumo win.");
-        }
-        if g.is_haitei && g.is_houtei {
-            return Err("Invalid state: Cannot be both Haitei and Houtei.");
-        }
-        if g.is_rinshan && a == AgariType::Ron {
-            return Err("Invalid state: Rinshan (kan draw) cannot be a Ron win.");
-        }
-        if g.is_chankan && a == AgariType::Tsumo {
-            return Err("Invalid state: Chankan (robbing kan) cannot be a Tsumo win.");
-        }
-
-        // Yakuman state conflicts
-        if g.is_tenhou {
-            if !p.is_oya {
-                return Err("Invalid state: Tenhou requires player to be Oya (dealer).");
-            }
-            if a != AgariType::Tsumo {
-                return Err("Invalid state: Tenhou must be a Tsumo win.");
-            }
-            if !input.open_melds.is_empty() || !input.closed_kans.is_empty() {
-                return Err("Invalid state: Tenhou cannot have any calls (no open melds or kans).");
-            }
-        }
-        if g.is_chiihou {
-            if p.is_oya {
-                return Err("Invalid state: Chiihou requires player to be non-Oya.");
-            }
-            if a != AgariType::Tsumo {
-                return Err("Invalid state: Chiihou must be a Tsumo win.");
-            }
-            if !input.open_melds.is_empty() || !input.closed_kans.is_empty() {
-                return Err(
-                    "Invalid state: Chiihou cannot have any calls (no open melds or kans).",
-                );
-            }
-        }
-        if g.is_renhou && a != AgariType::Ron {
-            return Err("Invalid state: Renhou must be a Ron win.");
-        }
-
-        Ok(())
-    }
-
-    /// invalid hand composition
-    fn validate_hand_composition(
-        input: &UserInput,
-        master_counts: &[u8; 34],
-    ) -> Result<(), &'static str> {
-        // Total Meld Count
-        if input.closed_kans.len() + input.open_melds.len() > 4 {
-            return Err("Invalid hand: More than 4 total melds (kans + open melds) declared.");
-        }
-
-        // Total Tile Count based on melds
-        let total_kans = input.closed_kans.len()
-            + input
-                .open_melds
-                .iter()
-                .filter(|m| m.mentsu_type == MentsuType::Kantsu)
-                .count();
-
-        let expected_tiles = (total_kans * 4) + ((4 - total_kans) * 3) + 2;
-
-        let hand_len = input.hand_tiles.len();
-        if hand_len == 14 && total_kans == 0 {
-        } else if hand_len != expected_tiles {
-            let err_msg = "Invalid hand: Tile count does not match declared kans. (Expected 14 for 0 kans, 15 for 1 kan, 16 for 2, 17 for 3, 18 for 4).";
-            return Err(err_msg);
-        }
-
-        // Winning Tile Presence
-        if !input.hand_tiles.contains(&input.winning_tile) {
-            return Err("Invalid input: Winning tile is not present in the list of hand tiles.");
-        }
-
-        // Max 4 of any tile (checked from master_counts)
-        if master_counts.iter().any(|&count| count > 4) {
-            return Err("Invalid hand: Contains 5 or more of a single tile type.");
-        }
-
-        // Akadora counts (using your new field)
-        let num_5m = master_counts[tile_to_index(&Hai::Suhai(5, Suhai::Manzu))];
-        let num_5p = master_counts[tile_to_index(&Hai::Suhai(5, Suhai::Pinzu))];
-        let num_5s = master_counts[tile_to_index(&Hai::Suhai(5, Suhai::Souzu))];
-        let total_fives = num_5m + num_5p + num_5s;
-
-        if input.game_context.num_akadora > total_fives {
-            return Err(
-                "Invalid input: Number of akadora exceeds the total number of '5' tiles in the hand.",
-            );
-        }
-
-        if input.game_context.num_akadora > 4 {
-            return Err("Invalid input: Number of akadora cannot be greater than 4.");
-        }
-
-        Ok(())
-    }
-
-    pub fn validate_input(input: &UserInput, master_counts: &[u8; 34]) -> Result<(), &'static str> {
-        validate_game_state(
-            &input.player_context,
-            &input.game_context,
-            input.agari_type,
-            input,
-        )?;
-
-        validate_hand_composition(input, master_counts)?;
-
-        Ok(())
-    }
-}
 
 // Recursive Parsing
 mod recursive_parser {
@@ -270,19 +126,18 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
     for tile in &input.hand_tiles {
         master_counts[tile_to_index(tile)] += 1;
     }
-    input_validator::validate_input(input, &master_counts)?;
 
-    let mut concealed_counts = master_counts;
+    // If Ron, the winning tile is not in hand_tiles
+    if input.agari_type == AgariType::Ron {
+        master_counts[tile_to_index(&input.winning_tile)] += 1;
+    }
+
+    let concealed_counts = master_counts;
     let mut final_mentsu: Vec<Mentsu> = Vec::with_capacity(4);
 
+    // Closed Kans
     for rep_tile in &input.closed_kans {
         let kan_tile = *rep_tile;
-        let index = tile_to_index(&kan_tile);
-
-        if concealed_counts[index] < 4 {
-            return Err("Invalid input: declared closed kan not present in hand tiles.");
-        }
-        concealed_counts[index] -= 4;
         final_mentsu.push(Mentsu {
             mentsu_type: MentsuType::Kantsu,
             is_minchou: false,
@@ -290,16 +145,13 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
         });
     }
 
+    // Open Melds
     for meld in &input.open_melds {
         let rep_tile = meld.representative_tile;
         let index = tile_to_index(&rep_tile);
 
         match meld.mentsu_type {
             MentsuType::Koutsu => {
-                if concealed_counts[index] < 3 {
-                    return Err("Invalid input: declared Pon not present in hand tiles.");
-                }
-                concealed_counts[index] -= 3;
                 final_mentsu.push(Mentsu {
                     mentsu_type: MentsuType::Koutsu,
                     is_minchou: true,
@@ -307,10 +159,6 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
                 });
             }
             MentsuType::Kantsu => {
-                if concealed_counts[index] < 4 {
-                    return Err("Invalid input: declared open Kan not present in hand tiles.");
-                }
-                concealed_counts[index] -= 4;
                 final_mentsu.push(Mentsu {
                     mentsu_type: MentsuType::Kantsu,
                     is_minchou: true,
@@ -325,16 +173,6 @@ pub fn organize_hand(input: &UserInput) -> Result<HandOrganization, &'static str
                 if index1 >= 27 || (index1 % 9) >= 7 {
                     return Err("Invalid representative tile for Chi (must be 1-7 of a suit).");
                 }
-                if concealed_counts[index1] < 1
-                    || concealed_counts[index2] < 1
-                    || concealed_counts[index3] < 1
-                {
-                    return Err("Invalid input: declared Chi not present in hand tiles.");
-                }
-
-                concealed_counts[index1] -= 1;
-                concealed_counts[index2] -= 1;
-                concealed_counts[index3] -= 1;
 
                 let t1 = rep_tile;
                 let t2 = index_to_tile(index2);

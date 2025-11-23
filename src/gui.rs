@@ -16,7 +16,7 @@ pub fn run() -> iced::Result {
 pub enum Message {
     // Phase 1 Messages
     AddTile(Hai),
-    RemoveTile(usize), 
+    RemoveTile(usize),
     ConfirmHand,
     ModifyHand,
     // Phase 2 Messages
@@ -24,7 +24,7 @@ pub enum Message {
     SelectWinningTile(Hai),
     StartAddOpenMeld,
     SelectMeldType(MentsuType),
-    SelectMeldTile(Hai), 
+    SelectMeldTile(Hai),
     StartAddClosedKan,
     SelectClosedKan(Hai),
     EditOpenMeld(usize),
@@ -32,7 +32,7 @@ pub enum Message {
     RemoveOpenMeld(usize),
     RemoveClosedKan(usize),
     // Phase 3 Messages
-    ToggleAgariType(AgariType), 
+    ToggleAgariType(AgariType),
     SetBakaze(Kaze),
     SetJikaze(Kaze),
     ToggleRiichi(bool),
@@ -61,7 +61,7 @@ enum Phase {
     Definition,
     SelectingWinningTile,
     SelectingMeldType { editing_index: Option<usize> },
-    SelectingMeldTile(MentsuType, Option<usize>), 
+    SelectingMeldTile(MentsuType, Option<usize>),
     SelectingClosedKan { editing_index: Option<usize> },
     SelectingDora,
     SelectingUraDora,
@@ -108,7 +108,7 @@ impl Sandbox for RiichiGui {
         Self {
             phase: Phase::Composition,
             hand_tiles: Vec::new(),
-            tile_counts: [4; 34], 
+            tile_counts: [4; 34],
             winning_tile: None,
             open_melds: Vec::new(),
             closed_kans: Vec::new(),
@@ -144,7 +144,7 @@ impl Sandbox for RiichiGui {
                     if self.tile_counts[idx] > 0 {
                         self.tile_counts[idx] -= 1;
                         self.hand_tiles.push(tile);
-                        self.hand_tiles.sort(); 
+                        self.hand_tiles.sort();
                     }
                 }
             }
@@ -260,15 +260,15 @@ impl Sandbox for RiichiGui {
                 self.agari_type = agari_type;
                 match self.agari_type {
                     AgariType::Ron => {
-                        self.is_tenhou = false; 
-                        self.is_chiihou = false; 
-                        self.is_haitei = false; 
-                        self.is_rinshan = false; 
+                        self.is_tenhou = false;
+                        self.is_chiihou = false;
+                        self.is_haitei = false;
+                        self.is_rinshan = false;
                     }
                     AgariType::Tsumo => {
-                        self.is_renhou = false; 
-                        self.is_houtei = false; 
-                        self.is_chankan = false; 
+                        self.is_renhou = false;
+                        self.is_houtei = false;
+                        self.is_chankan = false;
                     }
                 }
             }
@@ -325,10 +325,37 @@ impl Sandbox for RiichiGui {
                 self.phase = Phase::Definition;
             }
             Message::CalculateScore => {
-                // UserInput
+                // Collected inputs
                 if let Some(winning_tile) = self.winning_tile {
+                    // Remove tiles used in Open Melds
+                    let mut hand_tiles = self.hand_tiles.clone();
+                    for meld in &self.open_melds {
+                        let tiles = self.get_meld_tiles(meld);
+                        for t in tiles {
+                            if let Some(pos) = hand_tiles.iter().position(|x| x == &t) {
+                                hand_tiles.remove(pos);
+                            }
+                        }
+                    }
+
+                    // Remove tiles used in Closed Kans
+                    for kan in &self.closed_kans {
+                        for _ in 0..4 {
+                            if let Some(pos) = hand_tiles.iter().position(|x| x == kan) {
+                                hand_tiles.remove(pos);
+                            }
+                        }
+                    }
+
+                    // remove the winning tile from hand
+                    if self.agari_type == AgariType::Ron {
+                        if let Some(pos) = hand_tiles.iter().position(|x| x == &winning_tile) {
+                            hand_tiles.remove(pos);
+                        }
+                    }
+
                     let input = UserInput {
-                        hand_tiles: self.hand_tiles.clone(),
+                        hand_tiles,
                         open_melds: self.open_melds.clone(),
                         closed_kans: self.closed_kans.clone(),
                         winning_tile,
@@ -343,12 +370,12 @@ impl Sandbox for RiichiGui {
                         },
                         game_context: GameContext {
                             bakaze: self.bakaze,
-                            kyoku: 1, 
+                            kyoku: 1,
                             honba: self.honba,
-                            riichi_bou: if self.is_riichi { 1 } else { 0 }, 
+                            riichi_bou: if self.is_riichi { 1 } else { 0 },
                             dora_indicators: self.dora_indicators.clone(),
                             uradora_indicators: self.uradora_indicators.clone(),
-                            num_akadora: 0, 
+                            num_akadora: 0,
                             is_tenhou: self.is_tenhou,
                             is_chiihou: self.is_chiihou,
                             is_renhou: self.is_renhou,
@@ -358,7 +385,7 @@ impl Sandbox for RiichiGui {
                             is_chankan: self.is_chankan,
                         },
                     };
-
+                    // Calculate score
                     match calculate_agari(&input) {
                         Ok(result) => {
                             self.score_result = Some(Ok(result));
@@ -368,9 +395,6 @@ impl Sandbox for RiichiGui {
                         }
                     }
                     self.phase = Phase::Result;
-                } else {
-                    self.score_result = Some(Err("Please select a winning tile.".to_string()));
-                    self.phase = Phase::Result; 
                 }
             }
             Message::StartOver => {
@@ -396,6 +420,7 @@ impl Sandbox for RiichiGui {
             .width(Length::Fill)
             .height(Length::Fill)
             .center_x()
+            .center_y()
             .padding(20)
             .into()
     }
@@ -408,9 +433,9 @@ impl RiichiGui {
 
         let tile_count = self.hand_tiles.len();
         let counter_color = if tile_count < 14 {
-            Color::from_rgb(0.8, 0.0, 0.0) 
+            Color::from_rgb(0.8, 0.0, 0.0)
         } else {
-            Color::from_rgb(0.0, 0.5, 0.0) 
+            Color::from_rgb(0.0, 0.5, 0.0)
         };
 
         let counter_text = text(format!("Your Hand ({}/18 tiles)", tile_count))
@@ -442,11 +467,8 @@ impl RiichiGui {
                 ]
                 .spacing(10)
                 .align_items(iced::Alignment::Center),
-                None => row![
-                    button(text("Select Winning Tile..."))
-                        .on_press(Message::StartSelectWinningTile)
-                ]
-                .into(),
+                None =>
+                    row![button(text("Select")).on_press(Message::StartSelectWinningTile)].into(),
             }
         ]
         .spacing(10);
@@ -532,8 +554,8 @@ impl RiichiGui {
                 checkbox(label, is_checked).on_toggle(msg).into()
             } else {
                 row![
-                    checkbox("", is_checked),                          
-                    text(label).style(Color::from_rgb(0.5, 0.5, 0.5)) 
+                    checkbox("", is_checked),
+                    text(label).style(Color::from_rgb(0.5, 0.5, 0.5))
                 ]
                 .spacing(0)
                 .align_items(iced::Alignment::Center)
@@ -683,7 +705,12 @@ impl RiichiGui {
         ]
         .spacing(10);
 
-        let calculate_btn = button(text("Calculate Score")).on_press(Message::CalculateScore);
+        let calculate_btn =
+            button(text("Calculate Score")).on_press_maybe(if self.winning_tile.is_some() {
+                Some(Message::CalculateScore)
+            } else {
+                None
+            });
 
         column![
             row![hand_preview, modify_btn].spacing(20),
@@ -846,13 +873,16 @@ impl RiichiGui {
                     .align_items(iced::Alignment::Center)
                 }
             }
-            Some(Err(e)) => column![
-                text("Calculation Error")
-                    .size(24)
+            Some(Err(_)) => column![
+                text("No Yaku Found")
+                    .size(30)
                     .style(Color::from_rgb(0.8, 0.0, 0.0)),
-                text(e).size(16)
+                text("You need at least 1 Yaku to win.").size(20),
+                text("(Dora does not count as Yaku)")
+                    .size(16)
+                    .style(Color::from_rgb(0.5, 0.5, 0.5))
             ]
-            .spacing(20)
+            .spacing(15)
             .align_items(iced::Alignment::Center),
             None => column![text("No result available.")],
         };
@@ -921,7 +951,7 @@ impl RiichiGui {
             let is_valid = match m_type {
                 MentsuType::Koutsu => count >= 3,
                 MentsuType::Kantsu => count >= 4,
-                MentsuType::Shuntsu => count > 0, // Simplified for now
+                MentsuType::Shuntsu => count > 0,
             };
 
             if is_valid {
@@ -986,7 +1016,6 @@ impl RiichiGui {
     }
 
     fn view_selecting_dora(&self, is_ura: bool) -> Element<'_, Message> {
-
         let mut tiles = Vec::new();
 
         for i in 0..34 {
@@ -1006,12 +1035,7 @@ impl RiichiGui {
         }
 
         column![
-            text(if is_ura {
-                "Select Ura Dora Indicator"
-            } else {
-                "Select Dora Indicator"
-            })
-            .size(24),
+            text("Select").size(24),
             create_grid(tiles, 9),
             button(text("Cancel")).on_press(Message::ConfirmHand)
         ]
@@ -1034,7 +1058,10 @@ impl RiichiGui {
             })
             .collect();
 
-        row(tiles).spacing(5).into()
+        container(row(tiles).spacing(5))
+            .height(Length::Fixed(80.0))
+            .align_y(iced::alignment::Vertical::Center)
+            .into()
     }
 
     fn view_hand_preview_locked(&self) -> Element<'_, Message> {
@@ -1083,10 +1110,8 @@ impl RiichiGui {
         let mut tiles = Vec::new();
         match meld.mentsu_type {
             MentsuType::Shuntsu => {
-
                 let start_idx = crate::implements::tiles::tile_to_index(&meld.representative_tile);
                 if start_idx < 27 {
-
                     let suit_base = (start_idx / 9) * 9;
 
                     for i in 0..3 {

@@ -140,7 +140,7 @@ fn resolve_hand_structure(
                 let yakuman = check_chiitoitsu_yakuman(&chiitoitsu_structure);
                 Ok((chiitoitsu_structure, yakuman))
             } else {
-                Err("Invalid irregular hand. Not Kokushi or Chiitoitsu.")
+                Err("No Yaku Found")
             }
         }
     }
