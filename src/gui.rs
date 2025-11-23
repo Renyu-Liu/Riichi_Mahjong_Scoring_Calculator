@@ -5,7 +5,7 @@ use crate::implements::game::{AgariType, GameContext, PlayerContext};
 use crate::implements::hand::MentsuType;
 use crate::implements::input::{OpenMeldInput, UserInput};
 use crate::implements::tiles::{Hai, Jihai, Kaze, Sangenpai, Suhai};
-use iced::widget::{button, checkbox, column, container, radio, row, scrollable, text};
+use iced::widget::{button, checkbox, column, container, image, radio, row, scrollable, text};
 use iced::{Color, Element, Length, Sandbox, Settings, theme};
 
 pub fn run() -> iced::Result {
@@ -1250,24 +1250,33 @@ impl RiichiGui {
             let count = self.tile_counts[i];
             let image_path = get_tile_image_path(&tile, false);
 
-            let btn = button(
-                column![
-                    iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(50),
-                    text(format!("({})", count)).size(12)
-                ]
-                .align_items(iced::Alignment::Center),
-            )
-            .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
-                background_color: Color::WHITE,
-                text_color: Color::BLACK,
-            })))
-            .on_press_maybe(if count > 0 {
-                Some(Message::AddTile(tile))
+            let tile_image = image(image_path).width(50);
+
+            let count_text = text(format!("({})", count)).size(12).style(if count > 0 {
+                Color::BLACK
             } else {
-                None
-            })
-            .padding(5)
-            .into();
+                Color::from_rgb(0.5, 0.5, 0.5)
+            });
+
+            // Use different button background color to create dimming effect when tiles run out
+            let button_bg_color = if count > 0 {
+                Color::WHITE
+            } else {
+                Color::from_rgb(0.85, 0.85, 0.85) // Light grey for dimmed appearance
+            };
+
+            let btn = button(column![tile_image, count_text].align_items(iced::Alignment::Center))
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: button_bg_color,
+                    text_color: Color::BLACK,
+                })))
+                .on_press_maybe(if count > 0 {
+                    Some(Message::AddTile(tile))
+                } else {
+                    None
+                })
+                .padding(5)
+                .into();
 
             tiles.push(btn);
         }
