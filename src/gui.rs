@@ -5,7 +5,7 @@ use crate::implements::game::{AgariType, GameContext, PlayerContext};
 use crate::implements::hand::MentsuType;
 use crate::implements::input::{OpenMeldInput, UserInput};
 use crate::implements::tiles::{Hai, Jihai, Kaze, Sangenpai, Suhai};
-use iced::widget::{button, checkbox, column, container, image, radio, row, scrollable, text};
+use iced::widget::{button, checkbox, column, container, radio, row, scrollable, text};
 use iced::{Color, Element, Length, Sandbox, Settings, theme};
 
 pub fn run() -> iced::Result {
@@ -53,6 +53,9 @@ pub enum Message {
     SelectUraDora(Hai),
     CalculateScore,
     StartOver,
+    // Akadora Messages
+    IncrementAkadora,
+    DecrementAkadora,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -95,6 +98,7 @@ struct RiichiGui {
     is_chiihou: bool,
     is_renhou: bool,
     honba: u8,
+    num_akadora: u8,
     dora_indicators: Vec<Hai>,
     uradora_indicators: Vec<Hai>,
 
@@ -126,6 +130,7 @@ impl Sandbox for RiichiGui {
             is_chiihou: false,
             is_renhou: false,
             honba: 0,
+            num_akadora: 0,
             dora_indicators: Vec::new(),
             uradora_indicators: Vec::new(),
             score_result: None,
@@ -354,10 +359,14 @@ impl Sandbox for RiichiGui {
                         }
                     }
 
+                    let final_hand_tiles: Vec<Hai> = hand_tiles;
+                    let final_open_melds: Vec<OpenMeldInput> = self.open_melds.clone();
+                    let final_closed_kans: Vec<Hai> = self.closed_kans.clone();
+
                     let input = UserInput {
-                        hand_tiles,
-                        open_melds: self.open_melds.clone(),
-                        closed_kans: self.closed_kans.clone(),
+                        hand_tiles: final_hand_tiles,
+                        open_melds: final_open_melds,
+                        closed_kans: final_closed_kans,
                         winning_tile,
                         agari_type: self.agari_type,
                         player_context: PlayerContext {
@@ -375,7 +384,7 @@ impl Sandbox for RiichiGui {
                             riichi_bou: if self.is_riichi { 1 } else { 0 },
                             dora_indicators: self.dora_indicators.clone(),
                             uradora_indicators: self.uradora_indicators.clone(),
-                            num_akadora: 0,
+                            num_akadora: self.num_akadora,
                             is_tenhou: self.is_tenhou,
                             is_chiihou: self.is_chiihou,
                             is_renhou: self.is_renhou,
@@ -399,6 +408,16 @@ impl Sandbox for RiichiGui {
             }
             Message::StartOver => {
                 *self = Self::new();
+            }
+            Message::IncrementAkadora => {
+                if self.num_akadora < 4 {
+                    self.num_akadora += 1;
+                }
+            }
+            Message::DecrementAkadora => {
+                if self.num_akadora > 0 {
+                    self.num_akadora -= 1;
+                }
             }
         }
     }
@@ -466,12 +485,21 @@ impl RiichiGui {
         let winning_tile_section = column![
             text("Winning Tile:"),
             match &self.winning_tile {
-                Some(t) => row![
-                    image(image::Handle::from_path(get_tile_image_path(t))).width(40),
-                    button(text("Change")).on_press(Message::StartSelectWinningTile)
-                ]
-                .spacing(10)
-                .align_items(iced::Alignment::Center),
+                Some(t) => {
+                    {
+                        let e: Element<Message> = row![
+                            iced::widget::Image::<iced::widget::image::Handle>::new(
+                                get_tile_image_path(t, false)
+                            )
+                            .width(40),
+                            button(text("Change")).on_press(Message::StartSelectWinningTile)
+                        ]
+                        .spacing(10)
+                        .align_items(iced::Alignment::Center)
+                        .into();
+                        e
+                    }
+                }
                 None =>
                     row![button(text("Select")).on_press(Message::StartSelectWinningTile)].into(),
             }
@@ -489,9 +517,11 @@ impl RiichiGui {
                         let tile_images = row(tiles
                             .iter()
                             .map(|t| {
-                                image(image::Handle::from_path(get_tile_image_path(t)))
-                                    .width(40)
-                                    .into()
+                                iced::widget::Image::<iced::widget::image::Handle>::new(
+                                    get_tile_image_path(t, false),
+                                )
+                                .width(40)
+                                .into()
                             })
                             .collect::<Vec<Element<Message>>>())
                         .spacing(2);
@@ -517,9 +547,11 @@ impl RiichiGui {
                         let tile_images = row(tiles
                             .iter()
                             .map(|t| {
-                                image(image::Handle::from_path(get_tile_image_path(t)))
-                                    .width(40)
-                                    .into()
+                                iced::widget::Image::<iced::widget::image::Handle>::new(
+                                    get_tile_image_path(t, false),
+                                )
+                                .width(40)
+                                .into()
                             })
                             .collect::<Vec<Element<Message>>>())
                         .spacing(2);
@@ -677,14 +709,23 @@ impl RiichiGui {
             ]
             .spacing(10)
             .align_items(iced::Alignment::Center),
+            row![
+                text(format!("Akadora: {}", self.num_akadora)),
+                button(text("+")).on_press(Message::IncrementAkadora),
+                button(text("-")).on_press(Message::DecrementAkadora),
+            ]
+            .spacing(10)
+            .align_items(iced::Alignment::Center),
             column![
                 text("Dora Indicators:"),
                 row(self
                     .dora_indicators
                     .iter()
-                    .map(|t| image(image::Handle::from_path(get_tile_image_path(t)))
-                        .width(30)
-                        .into())
+                    .map(|t| iced::widget::Image::<iced::widget::image::Handle>::new(
+                        get_tile_image_path(t, false)
+                    )
+                    .width(30)
+                    .into())
                     .collect::<Vec<Element<Message>>>())
                 .spacing(5),
                 button(text("Add")).on_press(Message::StartAddDora),
@@ -694,9 +735,11 @@ impl RiichiGui {
                         row(self
                             .uradora_indicators
                             .iter()
-                            .map(|t| image(image::Handle::from_path(get_tile_image_path(t)))
-                                .width(30)
-                                .into())
+                            .map(|t| iced::widget::Image::<iced::widget::image::Handle>::new(
+                                get_tile_image_path(t, false)
+                            )
+                            .width(30)
+                            .into())
                             .collect::<Vec<Element<Message>>>())
                         .spacing(5),
                         button(text("Add")).on_press(Message::StartAddUraDora),
@@ -722,7 +765,8 @@ impl RiichiGui {
             });
 
         column![
-            row![hand_preview, modify_btn].spacing(20),
+            hand_preview,
+            modify_btn,
             winning_tile_section,
             melds_section,
             context_section,
@@ -906,21 +950,24 @@ impl RiichiGui {
     }
 
     fn view_selecting_winning_tile(&self) -> Element<'_, Message> {
-        let mut unique_tiles = self.hand_tiles.clone();
+        let mut unique_tiles: Vec<Hai> = self.hand_tiles.iter().map(|t| *t).collect();
+        unique_tiles.sort();
         unique_tiles.dedup();
 
         let tiles: Vec<Element<Message>> = unique_tiles
             .iter()
             .map(|tile| {
-                let image_path = get_tile_image_path(tile);
-                button(image(image::Handle::from_path(image_path)).width(50))
-                    .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
-                        background_color: Color::WHITE,
-                        text_color: Color::BLACK,
-                    })))
-                    .on_press(Message::SelectWinningTile(*tile))
-                    .padding(5)
-                    .into()
+                let image_path = get_tile_image_path(tile, false);
+                button(
+                    iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(50),
+                )
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::WHITE,
+                    text_color: Color::BLACK,
+                })))
+                .on_press(Message::SelectWinningTile(*tile))
+                .padding(5)
+                .into()
             })
             .collect();
 
@@ -985,15 +1032,17 @@ impl RiichiGui {
         let tiles: Vec<Element<Message>> = valid_tiles
             .iter()
             .map(|tile| {
-                let image_path = get_tile_image_path(tile);
-                button(image(image::Handle::from_path(image_path)).width(50))
-                    .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
-                        background_color: Color::WHITE,
-                        text_color: Color::BLACK,
-                    })))
-                    .on_press(Message::SelectMeldTile(*tile))
-                    .padding(5)
-                    .into()
+                let image_path = get_tile_image_path(tile, false);
+                button(
+                    iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(50),
+                )
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::WHITE,
+                    text_color: Color::BLACK,
+                })))
+                .on_press(Message::SelectMeldTile(*tile))
+                .padding(5)
+                .into()
             })
             .collect();
 
@@ -1029,15 +1078,17 @@ impl RiichiGui {
         let tiles: Vec<Element<Message>> = valid_tiles
             .iter()
             .map(|tile| {
-                let image_path = get_tile_image_path(tile);
-                button(image(image::Handle::from_path(image_path)).width(50))
-                    .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
-                        background_color: Color::WHITE,
-                        text_color: Color::BLACK,
-                    })))
-                    .on_press(Message::SelectClosedKan(*tile))
-                    .padding(5)
-                    .into()
+                let image_path = get_tile_image_path(tile, false);
+                button(
+                    iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(50),
+                )
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::WHITE,
+                    text_color: Color::BLACK,
+                })))
+                .on_press(Message::SelectClosedKan(*tile))
+                .padding(5)
+                .into()
             })
             .collect();
 
@@ -1061,20 +1112,22 @@ impl RiichiGui {
 
         for i in 0..34 {
             let tile = crate::implements::tiles::index_to_tile(i);
-            let image_path = get_tile_image_path(&tile);
+            let image_path = get_tile_image_path(&tile, false);
 
-            let btn = button(image(image::Handle::from_path(image_path)).width(40))
-                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
-                    background_color: Color::WHITE,
-                    text_color: Color::BLACK,
-                })))
-                .on_press(if is_ura {
-                    Message::SelectUraDora(tile)
-                } else {
-                    Message::SelectDora(tile)
-                })
-                .padding(5)
-                .into();
+            let btn = button(
+                iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(40),
+            )
+            .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                background_color: Color::WHITE,
+                text_color: Color::BLACK,
+            })))
+            .on_press(if is_ura {
+                Message::SelectUraDora(tile)
+            } else {
+                Message::SelectDora(tile)
+            })
+            .padding(5)
+            .into();
 
             tiles.push(btn);
         }
@@ -1100,15 +1153,17 @@ impl RiichiGui {
             .iter()
             .enumerate()
             .map(|(i, tile)| {
-                let image_path = get_tile_image_path(tile);
-                button(image(image::Handle::from_path(image_path)).width(40))
-                    .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
-                        background_color: Color::WHITE,
-                        text_color: Color::BLACK,
-                    })))
-                    .on_press(Message::RemoveTile(i))
-                    .padding(0)
-                    .into()
+                let image_path = get_tile_image_path(tile, false);
+                button(
+                    iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(40),
+                )
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::WHITE,
+                    text_color: Color::BLACK,
+                })))
+                .on_press(Message::RemoveTile(i))
+                .padding(0)
+                .into()
             })
             .collect();
 
@@ -1122,13 +1177,24 @@ impl RiichiGui {
         let tiles: Vec<Element<Message>> = self
             .hand_tiles
             .iter()
-            .map(|tile| {
-                let image_path = get_tile_image_path(tile);
-                image(image::Handle::from_path(image_path)).width(40).into()
+            .enumerate()
+            .map(|(_, tile)| {
+                let image_path = get_tile_image_path(tile, false);
+
+                let btn = button(
+                    iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(40),
+                )
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::WHITE,
+                    text_color: Color::BLACK,
+                })))
+                .padding(0);
+
+                btn.into()
             })
             .collect();
 
-        row(tiles).spacing(5).into()
+        create_grid(tiles, 14)
     }
 
     fn view_tile_pool(&self) -> Element<'_, Message> {
@@ -1137,11 +1203,11 @@ impl RiichiGui {
         for i in 0..34 {
             let tile = crate::implements::tiles::index_to_tile(i);
             let count = self.tile_counts[i];
-            let image_path = get_tile_image_path(&tile);
+            let image_path = get_tile_image_path(&tile, false);
 
             let btn = button(
                 column![
-                    image(image::Handle::from_path(image_path)).width(50),
+                    iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(50),
                     text(format!("({})", count)).size(12)
                 ]
                 .align_items(iced::Alignment::Center),
@@ -1211,7 +1277,16 @@ impl<'a> OnPressMaybe for button::Button<'a, Message> {
     }
 }
 
-fn get_tile_image_path(tile: &Hai) -> String {
+fn get_tile_image_path(tile: &Hai, is_akadora: bool) -> String {
+    if is_akadora {
+        match tile {
+            Hai::Suhai(5, Suhai::Manzu) => return "lib/Man5-Dora.png".to_string(),
+            Hai::Suhai(5, Suhai::Pinzu) => return "lib/Pin5-Dora.png".to_string(),
+            Hai::Suhai(5, Suhai::Souzu) => return "lib/Sou5-Dora.png".to_string(),
+            _ => {} // Fallback for invalid akadora
+        }
+    }
+
     let filename = match tile {
         Hai::Suhai(n, Suhai::Manzu) => format!("Man{}.png", n),
         Hai::Suhai(n, Suhai::Pinzu) => format!("Pin{}.png", n),
@@ -1224,7 +1299,7 @@ fn get_tile_image_path(tile: &Hai) -> String {
         Hai::Jihai(Jihai::Sangen(Sangenpai::Hatsu)) => "Hatsu.png".to_string(),
         Hai::Jihai(Jihai::Sangen(Sangenpai::Chun)) => "Chun.png".to_string(),
     };
-    format!("lib/tiles_image/{}", filename)
+    format!("lib/{}", filename)
 }
 
 fn create_grid(elements: Vec<Element<Message>>, columns: usize) -> Element<Message> {
