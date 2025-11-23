@@ -6,7 +6,7 @@ use crate::implements::hand::MentsuType;
 use crate::implements::input::{OpenMeldInput, UserInput};
 use crate::implements::tiles::{Hai, Jihai, Kaze, Sangenpai, Suhai};
 use iced::widget::{button, checkbox, column, container, image, radio, row, scrollable, text};
-use iced::{Color, Element, Length, Sandbox, Settings};
+use iced::{Color, Element, Length, Sandbox, Settings, theme};
 
 pub fn run() -> iced::Result {
     RiichiGui::run(Settings::default())
@@ -442,11 +442,16 @@ impl RiichiGui {
             .size(20)
             .style(counter_color);
 
-        let confirm_btn = button(text("Confirm Hand")).on_press_maybe(if tile_count >= 14 {
-            Some(Message::ConfirmHand)
-        } else {
-            None
-        });
+        let confirm_btn = button(text("Confirm Hand"))
+            .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                background_color: Color::from_rgb(0.0, 0.6, 0.0),
+                text_color: Color::WHITE,
+            })))
+            .on_press_maybe(if tile_count >= 14 {
+                Some(Message::ConfirmHand)
+            } else {
+                None
+            });
 
         column![counter_text, hand_preview, confirm_btn, tile_pool]
             .spacing(20)
@@ -682,7 +687,7 @@ impl RiichiGui {
                         .into())
                     .collect::<Vec<Element<Message>>>())
                 .spacing(5),
-                button(text("Add Dora")).on_press(Message::StartAddDora),
+                button(text("Add")).on_press(Message::StartAddDora),
                 if self.is_riichi {
                     column![
                         text("Ura Dora Indicators:"),
@@ -694,7 +699,7 @@ impl RiichiGui {
                                 .into())
                             .collect::<Vec<Element<Message>>>())
                         .spacing(5),
-                        button(text("Add Ura Dora")).on_press(Message::StartAddUraDora),
+                        button(text("Add")).on_press(Message::StartAddUraDora),
                     ]
                     .spacing(5)
                 } else {
@@ -705,8 +710,12 @@ impl RiichiGui {
         ]
         .spacing(10);
 
-        let calculate_btn =
-            button(text("Calculate Score")).on_press_maybe(if self.winning_tile.is_some() {
+        let calculate_btn = button(text("Calculate Score"))
+            .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                background_color: Color::from_rgb(0.0, 0.6, 0.0),
+                text_color: Color::WHITE,
+            })))
+            .on_press_maybe(if self.winning_tile.is_some() {
                 Some(Message::CalculateScore)
             } else {
                 None
@@ -905,6 +914,10 @@ impl RiichiGui {
             .map(|tile| {
                 let image_path = get_tile_image_path(tile);
                 button(image(image::Handle::from_path(image_path)).width(50))
+                    .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                        background_color: Color::WHITE,
+                        text_color: Color::BLACK,
+                    })))
                     .on_press(Message::SelectWinningTile(*tile))
                     .padding(5)
                     .into()
@@ -914,7 +927,12 @@ impl RiichiGui {
         column![
             text("Select Winning Tile").size(24),
             create_grid(tiles, 10),
-            button(text("Cancel")).on_press(Message::ConfirmHand)
+            button(text("Cancel"))
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::from_rgb(0.6, 0.0, 0.0),
+                    text_color: Color::WHITE,
+                })))
+                .on_press(Message::ConfirmHand)
         ]
         .spacing(20)
         .align_items(iced::Alignment::Center)
@@ -931,7 +949,12 @@ impl RiichiGui {
                 button(text("Kan (Kantsu)")).on_press(Message::SelectMeldType(MentsuType::Kantsu)),
             ]
             .spacing(20),
-            button(text("Cancel")).on_press(Message::ConfirmHand)
+            button(text("Cancel"))
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::from_rgb(0.6, 0.0, 0.0),
+                    text_color: Color::WHITE,
+                })))
+                .on_press(Message::ConfirmHand)
         ]
         .spacing(20)
         .align_items(iced::Alignment::Center)
@@ -964,6 +987,10 @@ impl RiichiGui {
             .map(|tile| {
                 let image_path = get_tile_image_path(tile);
                 button(image(image::Handle::from_path(image_path)).width(50))
+                    .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                        background_color: Color::WHITE,
+                        text_color: Color::BLACK,
+                    })))
                     .on_press(Message::SelectMeldTile(*tile))
                     .padding(5)
                     .into()
@@ -973,7 +1000,12 @@ impl RiichiGui {
         column![
             text(format!("Select Tile for {:?}", m_type)).size(24),
             create_grid(tiles, 10),
-            button(text("Cancel")).on_press(Message::ConfirmHand)
+            button(text("Cancel"))
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::from_rgb(0.6, 0.0, 0.0),
+                    text_color: Color::WHITE,
+                })))
+                .on_press(Message::ConfirmHand)
         ]
         .spacing(20)
         .align_items(iced::Alignment::Center)
@@ -999,6 +1031,10 @@ impl RiichiGui {
             .map(|tile| {
                 let image_path = get_tile_image_path(tile);
                 button(image(image::Handle::from_path(image_path)).width(50))
+                    .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                        background_color: Color::WHITE,
+                        text_color: Color::BLACK,
+                    })))
                     .on_press(Message::SelectClosedKan(*tile))
                     .padding(5)
                     .into()
@@ -1008,7 +1044,12 @@ impl RiichiGui {
         column![
             text("Select Tile for Closed Kan").size(24),
             create_grid(tiles, 10),
-            button(text("Cancel")).on_press(Message::ConfirmHand)
+            button(text("Cancel"))
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::from_rgb(0.6, 0.0, 0.0),
+                    text_color: Color::WHITE,
+                })))
+                .on_press(Message::ConfirmHand)
         ]
         .spacing(20)
         .align_items(iced::Alignment::Center)
@@ -1023,6 +1064,10 @@ impl RiichiGui {
             let image_path = get_tile_image_path(&tile);
 
             let btn = button(image(image::Handle::from_path(image_path)).width(40))
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::WHITE,
+                    text_color: Color::BLACK,
+                })))
                 .on_press(if is_ura {
                     Message::SelectUraDora(tile)
                 } else {
@@ -1037,7 +1082,12 @@ impl RiichiGui {
         column![
             text("Select").size(24),
             create_grid(tiles, 9),
-            button(text("Cancel")).on_press(Message::ConfirmHand)
+            button(text("Cancel"))
+                .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                    background_color: Color::from_rgb(0.6, 0.0, 0.0),
+                    text_color: Color::WHITE,
+                })))
+                .on_press(Message::ConfirmHand)
         ]
         .spacing(20)
         .align_items(iced::Alignment::Center)
@@ -1052,6 +1102,10 @@ impl RiichiGui {
             .map(|(i, tile)| {
                 let image_path = get_tile_image_path(tile);
                 button(image(image::Handle::from_path(image_path)).width(40))
+                    .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                        background_color: Color::WHITE,
+                        text_color: Color::BLACK,
+                    })))
                     .on_press(Message::RemoveTile(i))
                     .padding(0)
                     .into()
@@ -1092,6 +1146,10 @@ impl RiichiGui {
                 ]
                 .align_items(iced::Alignment::Center),
             )
+            .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
+                background_color: Color::WHITE,
+                text_color: Color::BLACK,
+            })))
             .on_press_maybe(if count > 0 {
                 Some(Message::AddTile(tile))
             } else {
@@ -1190,4 +1248,33 @@ fn create_grid(elements: Vec<Element<Message>>, columns: usize) -> Element<Messa
     }
 
     rows.into()
+}
+
+struct ColoredButtonStyle {
+    background_color: Color,
+    text_color: Color,
+}
+
+impl button::StyleSheet for ColoredButtonStyle {
+    type Style = iced::Theme;
+
+    fn active(&self, _style: &Self::Style) -> button::Appearance {
+        button::Appearance {
+            background: Some(iced::Background::Color(self.background_color)),
+            text_color: self.text_color,
+            border: iced::Border::with_radius(4.0),
+            ..Default::default()
+        }
+    }
+
+    fn hovered(&self, style: &Self::Style) -> button::Appearance {
+        let active = self.active(style);
+        button::Appearance {
+            background: Some(iced::Background::Color(Color {
+                a: 0.8,
+                ..self.background_color
+            })),
+            ..active
+        }
+    }
 }
