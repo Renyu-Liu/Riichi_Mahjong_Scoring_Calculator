@@ -68,7 +68,13 @@ The score breakdown includes the total points, fu/han points, and yaku detected.
 
 ## Technical Overview
 
-todo
+The flowchart below shows the logic flow of Riichi Mahjong Scoring Calculator:
+
+![flowchart](lib/readme_images/flowchart.png)
+
+Frontend Logic: The program directly handles all possible input conflicts according to Riichi Mahjong rules and guides users to correct their inputs. It ensures the input that sent to backend is recognizable.
+
+Backend Logic: The program involves multiple decision routes in the backend to detect all yaku, regular and irregular. Based on Riichi Mahjong scoring rules, there must be at least 1 yaku to calculate the score. Key crossroads include the check for hand structure and type of yaku. The final result is calculated based on the number of yaku and fu/han points.
 
 ## Challenges
 
