@@ -208,7 +208,7 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
         .spacing(20),
         // Bakaze
         row![
-            text("Prevalent Wind (Bakaze):"),
+            text("Prevalent Wind:"),
             radio("East", Kaze::Ton, Some(gui.bakaze), Message::SetBakaze),
             radio("South", Kaze::Nan, Some(gui.bakaze), Message::SetBakaze),
             radio("West", Kaze::Shaa, Some(gui.bakaze), Message::SetBakaze),
@@ -217,33 +217,33 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
         .spacing(10),
         // Jikaze
         row![
-            text("Player Wind (Jikaze):"),
+            text("Seat Wind:"),
             radio("East", Kaze::Ton, Some(gui.jikaze), Message::SetJikaze),
             radio("South", Kaze::Nan, Some(gui.jikaze), Message::SetJikaze),
             radio("West", Kaze::Shaa, Some(gui.jikaze), Message::SetJikaze),
             radio("North", Kaze::Pei, Some(gui.jikaze), Message::SetJikaze),
         ]
         .spacing(10),
-        // Riichi & Status
-        row![
-            checkbox_with_conflict("Riichi", gui.is_riichi, Message::ToggleRiichi, is_menzen),
-            checkbox_with_conflict(
-                "Double Riichi",
-                gui.is_daburu_riichi,
-                Message::ToggleDoubleRiichi,
-                is_menzen
-            ),
-            checkbox_with_conflict(
-                "Ippatsu",
-                gui.is_ippatsu,
-                Message::ToggleIppatsu,
-                gui.is_riichi || gui.is_daburu_riichi
-            ),
-        ]
-        .spacing(10),
         // Special Yaku
         column![
             text("Special Yaku:"),
+            // Riichi & Status
+            row![
+                checkbox_with_conflict("Riichi", gui.is_riichi, Message::ToggleRiichi, is_menzen),
+                checkbox_with_conflict(
+                    "Double Riichi",
+                    gui.is_daburu_riichi,
+                    Message::ToggleDoubleRiichi,
+                    is_menzen
+                ),
+                checkbox_with_conflict(
+                    "Ippatsu",
+                    gui.is_ippatsu,
+                    Message::ToggleIppatsu,
+                    gui.is_riichi || gui.is_daburu_riichi
+                ),
+            ]
+            .spacing(10),
             row![
                 checkbox_with_conflict(
                     "Tenhou",
@@ -335,11 +335,18 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
             row(gui
                 .dora_indicators
                 .iter()
-                .map(|t| iced::widget::Image::<iced::widget::image::Handle>::new(
-                    get_tile_image_path(t, false)
-                )
-                .width(30)
-                .into())
+                .enumerate()
+                .map(|(i, t)| {
+                    button(
+                        iced::widget::Image::<iced::widget::image::Handle>::new(
+                            get_tile_image_path(t, false),
+                        )
+                        .width(30),
+                    )
+                    .on_press(Message::RemoveDora(i))
+                    .style(theme::Button::Text)
+                    .into()
+                })
                 .collect::<Vec<Element<Message>>>())
             .spacing(5),
             button(text("Add"))
@@ -354,11 +361,18 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                     row(gui
                         .uradora_indicators
                         .iter()
-                        .map(|t| iced::widget::Image::<iced::widget::image::Handle>::new(
-                            get_tile_image_path(t, false)
-                        )
-                        .width(30)
-                        .into())
+                        .enumerate()
+                        .map(|(i, t)| {
+                            button(
+                                iced::widget::Image::<iced::widget::image::Handle>::new(
+                                    get_tile_image_path(t, false),
+                                )
+                                .width(30),
+                            )
+                            .on_press(Message::RemoveUraDora(i))
+                            .style(theme::Button::Text)
+                            .into()
+                        })
                         .collect::<Vec<Element<Message>>>())
                     .spacing(5),
                     button(text("Add"))

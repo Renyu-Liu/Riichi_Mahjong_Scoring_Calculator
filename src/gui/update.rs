@@ -187,6 +187,16 @@ impl Update for RiichiGui {
                 self.uradora_indicators.push(tile);
                 self.phase = Phase::Definition;
             }
+            Message::RemoveDora(index) => {
+                if index < self.dora_indicators.len() {
+                    self.dora_indicators.remove(index);
+                }
+            }
+            Message::RemoveUraDora(index) => {
+                if index < self.uradora_indicators.len() {
+                    self.uradora_indicators.remove(index);
+                }
+            }
             Message::CalculateScore => {
                 // Collected inputs
                 if let Some(winning_tile) = self.winning_tile {

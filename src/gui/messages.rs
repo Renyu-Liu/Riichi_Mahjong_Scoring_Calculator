@@ -42,6 +42,8 @@ pub enum Message {
     SelectDora(Hai),
     StartAddUraDora,
     SelectUraDora(Hai),
+    RemoveDora(usize),
+    RemoveUraDora(usize),
     CalculateScore,
     // Final score phase
     StartOver,

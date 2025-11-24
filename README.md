@@ -56,7 +56,7 @@ Click "Select" button under Winning Tile to select from your hand. You must sele
 
 Click "Change" to modify the winning tile.
 
-### 3: Selecting Game States (Optional)
+### 3: Selecting Game States
 
 ![open meld](lib/readme_images/open_meld.png)
 
@@ -66,9 +66,9 @@ Click "Add Pon/Chii/Kan" to add pon/chii/kan you made in your round. Click "Chan
 
 It will display all possible pon/chii/kan from your hand. Click the meld to select pon/chii/kan you made in your round. 
 
-![game_context](lib/readme_images/game_state.png)
+![game_context](lib/readme_images/context.png)
 
-You may check for seats, context-dependent yaku, dora, and honba in your round. Selecting correct game contexts yields accurate score breakdown. 
+You may check for seats, context-dependent yaku, and choose the number of honba and akadora in your round. Click "Add" to add a (ura)dora tile. Click the image of (ura)dora tile to remove it.
 
 ### 4: Generating Score Breakdown
 
