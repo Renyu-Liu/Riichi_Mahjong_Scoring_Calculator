@@ -8,8 +8,11 @@ use iced::Element;
 
 pub trait View {
     fn view(&self) -> Element<'_, Message>;
+    #[allow(dead_code)]
     fn view_composition(&self) -> Element<'_, Message>;
+    #[allow(dead_code)]
     fn view_definition(&self) -> Element<'_, Message>;
+    #[allow(dead_code)]
     fn view_result(&self) -> Element<'_, Message>;
     #[allow(dead_code)]
     fn view_selecting_winning_tile(&self) -> Element<'_, Message>;

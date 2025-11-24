@@ -143,7 +143,7 @@ pub fn count_concealed_koutsu(hand: &AgariHand, agari_type: AgariType) -> u8 {
         if m.mentsu_type == MentsuType::Koutsu {
             if agari_type == AgariType::Ron {
                 if m.tiles[0] == hand.agari_hai {
-                    continue; // This triplet was completed by Ron, not concealed.
+                    continue;
                 }
             }
             count += 1;

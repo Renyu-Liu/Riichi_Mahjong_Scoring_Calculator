@@ -77,7 +77,6 @@ impl RiichiGui {
             .into();
         }
 
-        // Create grouped meld buttons
         let meld_buttons: Vec<Element<Message>> = possible_melds
             .iter()
             .map(|meld| {
@@ -143,7 +142,6 @@ impl RiichiGui {
             .into();
         }
 
-        // Create grouped kan buttons (4 tiles each)
         let kan_buttons: Vec<Element<Message>> = possible_kans
             .iter()
             .map(|tile| {
@@ -160,7 +158,6 @@ impl RiichiGui {
                     .collect::<Vec<Element<Message>>>())
                 .spacing(2);
 
-                // Create a button that contains the grouped tiles
                 let kan_button = button(
                     container(tile_images)
                         .padding(5)

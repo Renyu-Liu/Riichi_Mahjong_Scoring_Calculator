@@ -111,25 +111,21 @@ impl RiichiGui {
         tiles
     }
 
-    /// Counts the total number of 5-tiles in the hand (including winning tile, melds, and kans)
     pub fn count_five_tiles(&self) -> u8 {
         let mut count = 0;
 
-        // Count 5-tiles in hand_tiles
         for tile in &self.hand_tiles {
             if matches!(tile, Hai::Suhai(5, _)) {
                 count += 1;
             }
         }
 
-        // Count 5-tiles in winning_tile
         if let Some(tile) = &self.winning_tile {
             if matches!(tile, Hai::Suhai(5, _)) {
                 count += 1;
             }
         }
 
-        // Count 5-tiles in open_melds
         for meld in &self.open_melds {
             let tiles = self.get_meld_tiles(meld);
             for tile in tiles {
@@ -139,10 +135,8 @@ impl RiichiGui {
             }
         }
 
-        // Count 5-tiles in closed_kans
         for tile in &self.closed_kans {
             if matches!(tile, Hai::Suhai(5, _)) {
-                // Closed kan has 4 tiles
                 count += 4;
             }
         }
@@ -156,7 +150,6 @@ impl RiichiGui {
             hand_counts[crate::implements::tiles::tile_to_index(tile)] += 1;
         }
 
-        // Calculate tiles needed for existing melds (excluding the one being edited)
         for (i, existing_meld) in self.open_melds.iter().enumerate() {
             if Some(i) == editing_idx {
                 continue;
@@ -166,14 +159,11 @@ impl RiichiGui {
                 if hand_counts[idx] > 0 {
                     hand_counts[idx] -= 1;
                 } else {
-                    // This shouldn't happen if state is consistent, but if it does,
-                    // it means we don't have enough tiles.
                     return false;
                 }
             }
         }
 
-        // Check if we have enough tiles for the new meld
         for tile in self.get_meld_tiles(meld) {
             let idx = crate::implements::tiles::tile_to_index(&tile);
             if hand_counts[idx] > 0 {
@@ -186,14 +176,12 @@ impl RiichiGui {
         true
     }
 
-    /// Get all possible Pon (Koutsu) melds from available tiles
     pub fn get_all_possible_pons(&self, editing_idx: Option<usize>) -> Vec<OpenMeldInput> {
         let mut available_counts = [0u8; 34];
         for tile in &self.hand_tiles {
             available_counts[crate::implements::tiles::tile_to_index(tile)] += 1;
         }
 
-        // Subtract tiles used in existing melds (excluding the one being edited)
         for (i, existing_meld) in self.open_melds.iter().enumerate() {
             if Some(i) == editing_idx {
                 continue;
@@ -219,14 +207,12 @@ impl RiichiGui {
         pons
     }
 
-    /// Get all possible Chii (Shuntsu) melds from available tiles
     pub fn get_all_possible_chiis(&self, editing_idx: Option<usize>) -> Vec<OpenMeldInput> {
         let mut available_counts = [0u8; 34];
         for tile in &self.hand_tiles {
             available_counts[crate::implements::tiles::tile_to_index(tile)] += 1;
         }
 
-        // Subtract tiles used in existing melds (excluding the one being edited)
         for (i, existing_meld) in self.open_melds.iter().enumerate() {
             if Some(i) == editing_idx {
                 continue;
@@ -240,7 +226,6 @@ impl RiichiGui {
         }
 
         let mut chiis = Vec::new();
-        // Check all possible sequences (only for numbered tiles 1-7 as starting point)
         for suit_offset in [0, 9, 18] {
             for start_num in 0..7 {
                 let idx1 = suit_offset + start_num;
@@ -262,14 +247,12 @@ impl RiichiGui {
         chiis
     }
 
-    /// Get all possible Kan (Kantsu) melds from available tiles
     pub fn get_all_possible_kans(&self) -> Vec<Hai> {
         let mut available_counts = [0u8; 34];
         for tile in &self.hand_tiles {
             available_counts[crate::implements::tiles::tile_to_index(tile)] += 1;
         }
 
-        // For closed kans, we need all 4 tiles from hand (not affected by open melds)
         let mut kans = Vec::new();
         for i in 0..34 {
             if available_counts[i] == 4 {

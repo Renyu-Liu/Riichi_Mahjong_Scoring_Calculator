@@ -5,12 +5,12 @@ use crate::implements::tiles::{Hai, Kaze};
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    // Phase 1 Messages
+    // composition phase
     AddTile(Hai),
     RemoveTile(usize),
     ConfirmHand,
+    // definition phase
     ModifyHand,
-    // Phase 2 Messages
     StartSelectWinningTile,
     SelectWinningTile(Hai),
     SelectMeldType(MentsuType),
@@ -21,7 +21,8 @@ pub enum Message {
     EditClosedKan(usize),
     RemoveOpenMeld(usize),
     RemoveClosedKan(usize),
-    // Phase 3 Messages
+    IncrementAkadora,
+    DecrementAkadora,
     ToggleAgariType(AgariType),
     SetBakaze(Kaze),
     SetJikaze(Kaze),
@@ -42,8 +43,6 @@ pub enum Message {
     StartAddUraDora,
     SelectUraDora(Hai),
     CalculateScore,
+    // Final score phase
     StartOver,
-    // Akadora Messages
-    IncrementAkadora,
-    DecrementAkadora,
 }
