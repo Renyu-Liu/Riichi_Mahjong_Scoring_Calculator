@@ -39,12 +39,22 @@ Click the tile in Tile Pool to add the tile into Hand Preview. Click the tile in
 You have to select at least 14 tiles to continue to next phase. Click "Confirm Hand" to continue.
 
 ### 2: Selecting Winning Tile
+
+![winning tiles](lib/readme_images/Winning_Tile.png)
+
 Click "Modify Hand" to return to tile selecting phase.
 
 Click "Select" button under Winning Tile to select from your hand. You must select one winning tile to continue to next phase.
 
 ### 3: Selecting Game States
-You may select any open melds/kans from your hand as long as they are available. You may also check winds, state-dependent yaku, dora, and honba.
+
+![select_huntsu](lib/readme_images/select_shuntsu.png)
+
+![selection_done](lib/readme_images/selection_done.png)
+
+You may select pon/chii/kan from your hand as long as they are available. You may also check winds, state-dependent yaku, dora, and honba.
+
+![game_context](lib/readme_images/game_state.png)
 
 Selecting correct game states yields accurate score breakdown. 
 
@@ -52,7 +62,7 @@ Scroll down and click "Calculate" button to view the final score breakdown.
 
 ### 4: Generating Score Breakdown
 
-
+![score](lib/readme_images/score.png)
 
 ## Technical Overview
 
