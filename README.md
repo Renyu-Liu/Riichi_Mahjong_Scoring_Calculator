@@ -9,25 +9,31 @@ Visit official Rust website [Rustup](https://rustup.rs) to download Rust. Follow
 
 ### Step 2: Download the program
 
-Option 1: Download and extract the ZIP file from [GitHub repo](https://github.com/Renyu-Liu/Riichi_Mahjong_Scoring_Calculator)
+* Option 1: Download and extract the ZIP file from [GitHub repo](https://github.com/Renyu-Liu/Riichi_Mahjong_Scoring_Calculator)
 
-Option 2: Clone the repository from [GitHub repo](https://github.com/Renyu-Liu/Riichi_Mahjong_Scoring_Calculator):
-
-    git clone https://github.com/Renyu-Liu/Riichi_Mahjong_Scoring_Calculator.git
+* Option 2: Clone the repository from [GitHub repo](https://github.com/Renyu-Liu/Riichi_Mahjong_Scoring_Calculator):
+    
+```bash
+git clone https://github.com/Renyu-Liu/Riichi_Mahjong_Scoring_Calculator.git
+```
 
 Note: Make sure the the folder directly contains `Cargo.toml` file (.../Riichi_Mahjong_Scoring_Calculator/Cargo.toml). Do not move `Cargo.toml` to other folders.
 
 ### Step 3: Run the program
 
-1: Change to the program folder:
+* Change to the program folder:
     
+```bash
     cd .../Riichi_Mahjong_Scoring_Calculator
+```
 
 Note: If you renamed "Riichi_Mahjong_Scoring_Calculator", `cd` goes with your renamed folder name
 
-2: Run the program:
+* Run the program:
 
-    Cargo run
+```bash
+    cargo run
+```
 
 ## User Manual
 
@@ -46,21 +52,27 @@ Click "Modify Hand" to return to tile selecting phase.
 
 Click "Select" button under Winning Tile to select from your hand. You must select one winning tile to continue to next phase.
 
-### 3: Selecting Game States
+![selection_done](lib/readme_images/winning_tile_done.png)
 
-![selection_done](lib/readme_images/selection_done.png)
+Click "Change" to modify the winning tile.
+
+### 3: Selecting Game States (Optional)
+
+![open meld](lib/readme_images/open_meld.png)
+
+Click "Add Pon/Chii/Kan" to add pon/chii/kan you made in your round. Click "Change" to modify the open meld. Click "Remove" to remove the open meld.
 
 ![select_huntsu](lib/readme_images/select_shuntsu.png)
 
-You may select pon/chii/kan from your hand as long as they are available. You may also check winds, state-dependent yaku, dora, and honba.
+It will display all possible pon/chii/kan from your hand. Click the meld to select pon/chii/kan you made in your round. 
 
 ![game_context](lib/readme_images/game_state.png)
 
-Selecting correct game states yields accurate score breakdown. 
-
-Scroll down and click "Calculate Score" button to view the final score breakdown.
+You may check for seats, context-dependent yaku, dora, and honba in your round. Selecting correct game contexts yields accurate score breakdown. 
 
 ### 4: Generating Score Breakdown
+
+Scroll down and click "Calculate Score" button to view the final score breakdown.
 
 ![score](lib/readme_images/score.png)
 
@@ -72,13 +84,15 @@ The flowchart below shows the logic flow of Riichi Mahjong Scoring Calculator:
 
 ![flowchart](lib/readme_images/flowchart.png)
 
-Frontend Logic: The program directly handles all possible input conflicts according to Riichi Mahjong rules and guides users to correct their inputs. It ensures the input that sent to backend is recognizable.
+* Frontend Logic: The program directly handles all possible input conflicts according to Riichi Mahjong rules and guides users to correct their inputs. It ensures the input that sent to backend is recognizable.
 
-Backend Logic: The program involves multiple decision routes in the backend to detect all yaku, regular and irregular. Based on Riichi Mahjong scoring rules, there must be at least 1 yaku to calculate the score. Key crossroads include the check for hand structure and type of yaku. The final result is calculated based on the number of yaku and fu/han points.
+* Backend Logic: The program involves multiple decision routes in the backend to detect all yaku, regular and irregular. Based on Riichi Mahjong scoring rules, there must be at least 1 yaku to calculate the score. Key crossroads include the check for hand structure and type of yaku. The final result is calculated based on the number of yaku and fu/han points.
 
 ## Challenges
 
-We face challenges in improving loading speed. We found that the loading time for the tile pool is too long, which is restricted by the image loading speed. We are working on it.
+* Loading speed: We face challenges in improving loading speed. We found that the loading time for the tile pool is too long, which is restricted by the image loading speed. We are working on it.
+
+* Yaku check: Some rare yaku with complicated rules are not correctly detected. We are working on it.
 
 ## Reference
 
