@@ -1,5 +1,5 @@
 # Riichi Mahjong Scoring Calculator
-Created by Thomas (@akakrabz), Karan (@Karan-Annam), Renyu (@Renyu-Liu)
+_Created by Thomas (@akakrabz), Karan (@Karan-Annam), and Renyu (@Renyu-Liu) as the final project for [CS 128H](https://honors.cs128.org)_
 ## Introduction
 Riichi Mahjong has a complicated mechanism of scoring calculation. People often find it hard to calculate points manually. That's why we have introduced Riichi Mahjong Scoring Calculator. This is a Rust library that calculates the score of a winning Riichi Mahjong hand. It receives a complete input of the winning hand and game state and returns a detailed score breakdown, guiding players to redistribute their points.
 ## Installation
@@ -94,7 +94,7 @@ The flowchart below shows the logic flow of Riichi Mahjong Scoring Calculator:
 
 ## Challenges
 
-* Loading speed: We face challenges in improving loading speed. We found that the loading time for the tile pool is too long, which is restricted by the image loading speed. We are working on it.
+* Loading speed: We found that the loading time for a large amount of tiles is too long, which is restricted by the image loading speed. We are working on it.
 
 * Yaku check: Some rare yaku with complicated rules are not correctly detected. We are working on it.
 
