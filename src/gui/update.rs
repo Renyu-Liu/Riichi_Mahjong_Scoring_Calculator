@@ -96,12 +96,7 @@ impl Update for RiichiGui {
                 }
                 self.phase = Phase::Definition;
             }
-            Message::EditOpenMeld(idx) => {
-                if idx < self.open_melds.len() {
-                    let meld = &self.open_melds[idx];
-                    self.phase = Phase::SelectingMeldTile(meld.mentsu_type, Some(idx));
-                }
-            }
+
             Message::EditClosedKan(idx) => {
                 if idx < self.closed_kans.len() {
                     self.phase = Phase::SelectingClosedKan {

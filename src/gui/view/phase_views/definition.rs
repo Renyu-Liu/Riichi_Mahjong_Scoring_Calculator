@@ -23,16 +23,14 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
             Some(t) => {
                 {
                     let e: Element<Message> = row![
-                        iced::widget::Image::<iced::widget::image::Handle>::new(
-                            get_tile_image_path(t)
+                        button(
+                            iced::widget::Image::<iced::widget::image::Handle>::new(
+                                get_tile_image_path(t)
+                            )
+                            .width(40)
                         )
-                        .width(40),
-                        button(text("Change"))
-                            .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
-                                background_color: Color::from_rgb(0.0, 0.0, 0.6),
-                                text_color: Color::WHITE,
-                            })))
-                            .on_press(Message::StartSelectWinningTile)
+                        .on_press(Message::StartSelectWinningTile)
+                        .style(theme::Button::Text)
                     ]
                     .spacing(10)
                     .align_items(iced::Alignment::Center)
@@ -76,19 +74,9 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                     .spacing(2);
 
                     row![
-                        tile_images,
-                        button(text("Change"))
-                            .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
-                                background_color: Color::from_rgb(0.0, 0.0, 0.6),
-                                text_color: Color::WHITE,
-                            })))
-                            .on_press(Message::EditOpenMeld(i)),
-                        button(text("Remove"))
-                            .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
-                                background_color: Color::from_rgb(0.6, 0.0, 0.0),
-                                text_color: Color::WHITE,
-                            })))
+                        button(tile_images)
                             .on_press(Message::RemoveOpenMeld(i))
+                            .style(theme::Button::Text)
                     ]
                     .spacing(10)
                     .align_items(iced::Alignment::Center)

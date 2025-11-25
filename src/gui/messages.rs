@@ -17,7 +17,7 @@ pub enum Message {
     SelectCompleteMeld(OpenMeldInput),
     StartAddClosedKan,
     SelectClosedKan(Hai),
-    EditOpenMeld(usize),
+
     EditClosedKan(usize),
     RemoveOpenMeld(usize),
     RemoveClosedKan(usize),
