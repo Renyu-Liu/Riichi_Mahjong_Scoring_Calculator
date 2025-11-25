@@ -38,7 +38,7 @@ Note: If you renamed "Riichi_Mahjong_Scoring_Calculator", `cd` goes with your re
 ## User Manual
 
 ### 1: Selecting Tiles
-![Selecting Tiles](lib/readme_images/Composition_Phase.jpg)
+<img width="778" height="664" alt="Composition_Phase" src="https://github.com/user-attachments/assets/e9055b58-ed2f-4f56-9e53-eaa1e299ee75" />
 
 Click the tile in Tile Pool to add the tile into Hand Preview. Click the tile in Hand Preview to remove the tile.
 
@@ -46,27 +46,31 @@ You have to select at least 14 tiles to continue to next phase. Click "Confirm H
 
 ### 2: Selecting Winning Tile
 
-![winning tiles](lib/readme_images/winning_tile.png)
+<img width="778" height="218" alt="winning_tile" src="https://github.com/user-attachments/assets/be44c957-56e9-485d-bcc5-80a8b31a28c6" />
 
 Click "Modify Hand" to return to tile selecting phase.
 
 Click "Select" button under Winning Tile to select from your hand. You must select one winning tile to continue to next phase.
 
-![selection_done](lib/readme_images/winning_tile_done.png)
+<img width="730" height="297" alt="select_winning_tile" src="https://github.com/user-attachments/assets/04ad8828-8df4-4316-a4dd-940929b2e2d8" />
+
+Click the tile image to select the winning tile.
+
+<img width="847" height="291" alt="winning_tile_done" src="https://github.com/user-attachments/assets/44f5bdda-47b1-451b-9ba4-95a7ae01e237" />
 
 Click "Change" to modify the winning tile.
 
 ### 3: Selecting Game States
 
-![open meld](lib/readme_images/open_meld.png)
+<img width="807" height="188" alt="open_meld" src="https://github.com/user-attachments/assets/eadffdea-e5bf-411a-aff1-409cd58373f7" />
 
 Click "Add Pon/Chii/Kan" to add pon/chii/kan you made in your round. Click "Change" to modify the open meld. Click "Remove" to remove the open meld.
 
-![select_huntsu](lib/readme_images/select_shuntsu.png)
+<img width="752" height="213" alt="select_shuntsu" src="https://github.com/user-attachments/assets/d7525893-153a-4147-9440-2fc574888f55" />
 
 It will display all possible pon/chii/kan from your hand. Click the meld to select pon/chii/kan you made in your round. 
 
-![game_context](lib/readme_images/context.png)
+<img width="968" height="635" alt="context" src="https://github.com/user-attachments/assets/94e2c986-f594-4b76-b2d6-376ec644dbfe" />
 
 You may check for seats, context-dependent yaku, and choose the number of honba and akadora in your round. Click "Add" to add a (ura)dora tile. Click the image of (ura)dora tile to remove it.
 
@@ -74,7 +78,7 @@ You may check for seats, context-dependent yaku, and choose the number of honba 
 
 Scroll down and click "Calculate Score" button to view the final score breakdown.
 
-![score](lib/readme_images/score.png)
+<img width="1019" height="551" alt="score" src="https://github.com/user-attachments/assets/cada3a9a-3d79-4030-ae31-8c7b9241b7e9" />
 
 The score breakdown includes the total points, fu/han points, and yaku detected. It also guides players to redistribute their points.
 
@@ -82,7 +86,7 @@ The score breakdown includes the total points, fu/han points, and yaku detected.
 
 The flowchart below shows the logic flow of Riichi Mahjong Scoring Calculator:
 
-![flowchart](lib/readme_images/flowchart.png)
+<img width="964" height="1039" alt="flowchart" src="https://github.com/user-attachments/assets/b5991162-1413-4a28-9ac5-72704ff056c4" />
 
 * Frontend Logic: The program directly handles all possible input conflicts according to Riichi Mahjong rules and guides users to correct their inputs. It ensures the input that sent to backend is recognizable.
 
