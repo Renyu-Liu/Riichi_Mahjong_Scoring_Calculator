@@ -12,7 +12,7 @@ impl RiichiGui {
             .iter()
             .enumerate()
             .map(|(i, tile)| {
-                let image_path = get_tile_image_path(tile, false);
+                let image_path = get_tile_image_path(tile);
                 button(
                     iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(40),
                 )
@@ -38,7 +38,7 @@ impl RiichiGui {
             .iter()
             .enumerate()
             .map(|(_, tile)| {
-                let image_path = get_tile_image_path(tile, false);
+                let image_path = get_tile_image_path(tile);
 
                 let btn = button(
                     iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(40),
@@ -62,7 +62,7 @@ impl RiichiGui {
         for i in 0..34 {
             let tile = crate::implements::tiles::index_to_tile(i);
             let count = self.tile_counts[i];
-            let image_path = get_tile_image_path(&tile, false);
+            let image_path = get_tile_image_path(&tile);
 
             let tile_image = image(image_path).width(50);
 

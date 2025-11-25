@@ -16,7 +16,7 @@ impl RiichiGui {
         let tiles: Vec<Element<Message>> = unique_tiles
             .iter()
             .map(|tile| {
-                let image_path = get_tile_image_path(tile, false);
+                let image_path = get_tile_image_path(tile);
                 button(
                     iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(50),
                 )
@@ -85,7 +85,7 @@ impl RiichiGui {
                     .iter()
                     .map(|t| {
                         iced::widget::Image::<iced::widget::image::Handle>::new(
-                            get_tile_image_path(t, false),
+                            get_tile_image_path(t),
                         )
                         .width(50)
                         .into()
@@ -150,7 +150,7 @@ impl RiichiGui {
                     .iter()
                     .map(|t| {
                         iced::widget::Image::<iced::widget::image::Handle>::new(
-                            get_tile_image_path(t, false),
+                            get_tile_image_path(t),
                         )
                         .width(50)
                         .into()
@@ -194,7 +194,7 @@ impl RiichiGui {
 
         for i in 0..34 {
             let tile = crate::implements::tiles::index_to_tile(i);
-            let image_path = get_tile_image_path(&tile, false);
+            let image_path = get_tile_image_path(&tile);
 
             let btn = button(
                 iced::widget::Image::<iced::widget::image::Handle>::new(image_path).width(40),

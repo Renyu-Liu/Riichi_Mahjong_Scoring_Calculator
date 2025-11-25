@@ -24,7 +24,7 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                 {
                     let e: Element<Message> = row![
                         iced::widget::Image::<iced::widget::image::Handle>::new(
-                            get_tile_image_path(t, false)
+                            get_tile_image_path(t)
                         )
                         .width(40),
                         button(text("Change"))
@@ -67,7 +67,7 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                         .iter()
                         .map(|t| {
                             iced::widget::Image::<iced::widget::image::Handle>::new(
-                                get_tile_image_path(t, false),
+                                get_tile_image_path(t),
                             )
                             .width(40)
                             .into()
@@ -108,7 +108,7 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                         .iter()
                         .map(|t| {
                             iced::widget::Image::<iced::widget::image::Handle>::new(
-                                get_tile_image_path(t, false),
+                                get_tile_image_path(t),
                             )
                             .width(40)
                             .into()
@@ -339,7 +339,7 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                 .map(|(i, t)| {
                     button(
                         iced::widget::Image::<iced::widget::image::Handle>::new(
-                            get_tile_image_path(t, false),
+                            get_tile_image_path(t),
                         )
                         .width(30),
                     )
@@ -365,7 +365,7 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                         .map(|(i, t)| {
                             button(
                                 iced::widget::Image::<iced::widget::image::Handle>::new(
-                                    get_tile_image_path(t, false),
+                                    get_tile_image_path(t),
                                 )
                                 .width(30),
                             )
