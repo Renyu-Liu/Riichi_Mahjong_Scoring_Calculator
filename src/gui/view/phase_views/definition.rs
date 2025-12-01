@@ -18,7 +18,7 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
 
     // Winning Tile Section
     let winning_tile_section = column![
-        text("Winning Tile:"),
+        text("Winning Tile:").size(18),
         match &gui.winning_tile {
             Some(t) => {
                 {
@@ -55,7 +55,7 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
 
     // Melds Section
     let melds_section = column![
-        text("Open Melds:"),
+        text("Open Melds:").size(18),
         // Display existing open melds
         column(
             gui.open_melds
@@ -220,9 +220,10 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
             radio("North", Kaze::Pei, Some(gui.jikaze), Message::SetJikaze),
         ]
         .spacing(10),
+        iced::widget::rule::Rule::horizontal(30),
         // Special Yaku
         column![
-            text("Special Yaku:"),
+            text("Special Yaku:").size(18),
             // Riichi & Status
             row![
                 checkbox_with_conflict("Riichi", gui.is_riichi, Message::ToggleRiichi, is_menzen),
@@ -268,8 +269,10 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                 checkbox_with_conflict("Chankan", gui.is_chankan, Message::ToggleChankan, is_ron),
             ]
             .spacing(10),
+            iced::widget::rule::Rule::horizontal(30),
         ]
-        .spacing(5),
+        .spacing(5)
+        .align_items(iced::Alignment::Center),
         // Honba Counter
         row![
             text(format!("Honba: {}", gui.honba)),
@@ -382,13 +385,16 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                         .on_press(Message::StartAddUraDora),
                 ]
                 .spacing(5)
+                .align_items(iced::Alignment::Center)
             } else {
                 column![]
             }
         ]
         .spacing(5)
+        .align_items(iced::Alignment::Center)
     ]
-    .spacing(10);
+    .spacing(10)
+    .align_items(iced::Alignment::Center);
 
     let calculate_btn = button(text("Calculate Score"))
         .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
@@ -401,17 +407,28 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
             None
         });
 
-    column![
+    let mut content = column![
         hand_preview,
         modify_btn,
         iced::widget::rule::Rule::horizontal(30),
         winning_tile_section,
+        iced::widget::rule::Rule::horizontal(30),
         melds_section,
         iced::widget::rule::Rule::horizontal(30),
         context_section,
         calculate_btn
-    ]
-    .spacing(20)
-    .align_items(iced::Alignment::Center)
-    .into()
+    ];
+
+    if gui.winning_tile.is_none() {
+        content = content.push(
+            text("You must select a winning tile")
+                .size(12)
+                .style(Color::from_rgb(0.8, 0.0, 0.0)),
+        );
+    }
+
+    content
+        .spacing(20)
+        .align_items(iced::Alignment::Center)
+        .into()
 }
