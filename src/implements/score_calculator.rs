@@ -30,32 +30,31 @@ pub fn calculate_score(
         let limit_name = Some(HandLimit::Yakuman);
         let base_yakuman_points = (8000 * num_yakuman) as u32;
 
-        let (base_points, oya_payment, ko_payment, total_payment) =
-            match (player.is_oya, agari_type) {
-                // Oya Tsumo
-                (true, AgariType::Tsumo) => {
-                    let p = round_up_100(base_yakuman_points * 2);
-                    let total = (p + tsumo_bonus) * 3;
-                    (p, p, 0, total)
-                }
-                // Ko Tsumo
-                (false, AgariType::Tsumo) => {
-                    let oya_p = round_up_100(base_yakuman_points * 2);
-                    let ko_p = round_up_100(base_yakuman_points * 1);
-                    let total = (oya_p + tsumo_bonus) + (ko_p + tsumo_bonus) * 2;
-                    (ko_p, oya_p, ko_p, total)
-                }
-                // Oya Ron
-                (true, AgariType::Ron) => {
-                    let total = round_up_100(base_yakuman_points * 6) + ron_bonus;
-                    (total, 0, 0, total)
-                }
-                // Ko Ron
-                (false, AgariType::Ron) => {
-                    let total = round_up_100(base_yakuman_points * 4) + ron_bonus;
-                    (total, 0, 0, total)
-                }
-            };
+        let (oya_payment, ko_payment, total_payment) = match (player.is_oya, agari_type) {
+            // Oya Tsumo
+            (true, AgariType::Tsumo) => {
+                let p = round_up_100(base_yakuman_points * 2);
+                let total = (p + tsumo_bonus) * 3;
+                (p, 0, total)
+            }
+            // Ko Tsumo
+            (false, AgariType::Tsumo) => {
+                let oya_p = round_up_100(base_yakuman_points * 2);
+                let ko_p = round_up_100(base_yakuman_points * 1);
+                let total = (oya_p + tsumo_bonus) + (ko_p + tsumo_bonus) * 2;
+                (oya_p, ko_p, total)
+            }
+            // Oya Ron
+            (true, AgariType::Ron) => {
+                let total = round_up_100(base_yakuman_points * 6) + ron_bonus;
+                (0, 0, total)
+            }
+            // Ko Ron
+            (false, AgariType::Ron) => {
+                let total = round_up_100(base_yakuman_points * 4) + ron_bonus;
+                (0, 0, total)
+            }
+        };
 
         return AgariResult {
             han,
@@ -63,7 +62,6 @@ pub fn calculate_score(
             yaku_list,
             num_akadora: 0,
             limit_name,
-            base_points,
             oya_payment,
             ko_payment,
             total_payment,
@@ -86,29 +84,29 @@ pub fn calculate_score(
     let (basic_points, limit_name) = calculate_basic_points(han, fu);
 
     // Calculate Final Payments
-    let (base_points, oya_payment, ko_payment, total_payment) = match (player.is_oya, agari_type) {
+    let (oya_payment, ko_payment, total_payment) = match (player.is_oya, agari_type) {
         // Oya Tsumo
         (true, AgariType::Tsumo) => {
             let p = round_up_100(basic_points * 2);
             let total = (p + tsumo_bonus) * 3;
-            (p, p, 0, total)
+            (p, 0, total)
         }
         // Ko Tsumo
         (false, AgariType::Tsumo) => {
             let oya_p = round_up_100(basic_points * 2);
             let ko_p = round_up_100(basic_points * 1);
             let total = (oya_p + tsumo_bonus) + (ko_p + tsumo_bonus) * 2;
-            (ko_p, oya_p, ko_p, total)
+            (oya_p, ko_p, total)
         }
         // Oya Ron
         (true, AgariType::Ron) => {
             let total = round_up_100(basic_points * 6) + ron_bonus;
-            (total, 0, 0, total)
+            (0, 0, total)
         }
         // Ko Ron
         (false, AgariType::Ron) => {
             let total = round_up_100(basic_points * 4) + ron_bonus;
-            (total, 0, 0, total)
+            (0, 0, total)
         }
     };
 
@@ -118,7 +116,6 @@ pub fn calculate_score(
         yaku_list,
         num_akadora,
         limit_name,
-        base_points,
         oya_payment,
         ko_payment,
         total_payment,

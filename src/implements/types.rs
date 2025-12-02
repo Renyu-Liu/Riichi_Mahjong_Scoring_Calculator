@@ -3,7 +3,7 @@
 pub mod tiles {
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
     pub enum Suhai {
-        // 数牌 (Numbered Tiles)
+        // 数牌 (Number)
         Manzu, // 萬子 (Characters)
         Pinzu, // 筒子 (Circles)
         Souzu, // 索子 (Bamboo)
@@ -11,7 +11,7 @@ pub mod tiles {
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
     pub enum Kaze {
-        // 風牌 (Wind Tiles)
+        // 風牌 (Wind)
         Ton,  // 東 (East)
         Nan,  // 南 (South)
         Shaa, // 西 (West)
@@ -20,7 +20,7 @@ pub mod tiles {
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
     pub enum Sangenpai {
-        // 三元牌 (Dragon Tiles)
+        // 三元牌 (Dragon)
         Haku,  // 白 (White)
         Hatsu, // 發 (Green)
         Chun,  // 中 (Red)
@@ -28,7 +28,7 @@ pub mod tiles {
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
     pub enum Jihai {
-        // 字牌 (Honor Tiles)
+        // 字牌 (Honor)
         Kaze(Kaze),
         Sangen(Sangenpai),
     }
@@ -36,12 +36,12 @@ pub mod tiles {
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
     pub enum Hai {
         // 牌 (Tile)
-        Suhai(u8, Suhai), // 数牌 (Numbered tile, 1-9)
-        Jihai(Jihai),     // 字牌 (Honor tile)
+        Suhai(u8, Suhai), // 数牌 (Number, 1-9)
+        Jihai(Jihai),     // 字牌 (Honor)
     }
 
     impl Hai {
-        // simple (2-8 suhai)
+        // simple (2-8)
         pub fn is_simple(&self) -> bool {
             match self {
                 Hai::Suhai(n, _) => *n >= 2 && *n <= 8,
@@ -62,7 +62,7 @@ pub mod tiles {
             matches!(self, Hai::Jihai(_))
         }
 
-        // terminal or honor (yaochuu-hai)
+        // terminal or honor (yaochuu)
         pub fn is_yaochuu(&self) -> bool {
             self.is_terminal() || self.is_jihai()
         }
@@ -135,15 +135,15 @@ pub mod hand {
     #[derive(Debug, Clone, Copy)]
     pub struct AgariHand {
         // 和了手 (Winning Hand)
-        pub mentsu: [Mentsu; 4], // 面子 (The 4 melds)
-        pub atama: (Hai, Hai),   // 頭 (The pair)
+        pub mentsu: [Mentsu; 4], // 面子 (4 melds)
+        pub atama: (Hai, Hai),   // 頭 (1 pair)
         pub agari_hai: Hai,      // 和了牌 (The winning tile)
         pub machi: Machi,        // 待ち (The wait type)
     }
 
     #[derive(Debug, Clone)]
     pub enum HandOrganization {
-        YonmentsuIchiatama(AgariHand), // 四面子一頭 (Standard Hand: 4 Melds, 1 Pair)
+        YonmentsuIchiatama(AgariHand), // 四面子一頭 (4 Melds, 1 Pair)
         Irregular {
             // 非標準手 (Irregular Hand)
             counts: [u8; 34],
@@ -192,31 +192,27 @@ pub mod game {
     // Context for winning the hand
     pub struct PlayerContext {
         pub jikaze: Kaze,           // 自風 (Seat Wind)
-        pub is_oya: bool,           // 親 (Is player the dealer?)
-        pub is_riichi: bool,        // 立直 (Was Riichi declared?)
+        pub is_oya: bool,           // 親 (dealer)
+        pub is_riichi: bool,        // 立直 (Riichi)
         pub is_daburu_riichi: bool, // ダブル立直 (Double Riichi)
         pub is_ippatsu: bool,       // 一発 (Ippatsu)
-        pub is_menzen: bool,        // 門前 (Is the hand fully concealed?)
+        pub is_menzen: bool,        // 門前 (fully concealed)
     }
 
     #[derive(Debug, Clone)]
     // Context for the current round
     pub struct GameContext {
-        pub bakaze: Kaze, // 場風 (Prevalent Wind)
-        #[allow(dead_code)]
-        pub kyoku: u8, // 局 (Round number)
-        pub honba: u8,    // 本場 (Honba counter)
-        #[allow(dead_code)]
-        pub riichi_bou: u8, // リーチ棒 (Riichi sticks)
-        pub dora_indicators: Vec<Hai>, // ドラ表示牌 (Dora indicators)
+        pub bakaze: Kaze,                 // 場風 (Prevalent Wind)
+        pub honba: u8,                    // 本場 (Honba counter)
+        pub dora_indicators: Vec<Hai>,    // ドラ表示牌 (Dora indicators)
         pub uradora_indicators: Vec<Hai>, // 裏ドラ表示牌 (Ura Dora indicators)
-        pub num_akadora: u8, // 赤ドラ (Red Dora)
+        pub num_akadora: u8,              // 赤ドラ (Red Dora)
         // Special win condition flags
         pub is_tenhou: bool,  // 天和 (Blessing of Heaven)
         pub is_chiihou: bool, // 地和 (Blessing of Earth)
         pub is_renhou: bool,  // 人和 (Blessing of Man)
-        pub is_haitei: bool,  // 海底 (Under the Sea - last draw)
-        pub is_houtei: bool,  // 河底 (Under the River - last discard)
+        pub is_haitei: bool,  // 海底 (last draw)
+        pub is_houtei: bool,  // 河底 (last discard)
         pub is_rinshan: bool, // 嶺上 (After a Kan)
         pub is_chankan: bool, // 搶槓 (Robbing a Kan)
     }
@@ -322,14 +318,9 @@ pub mod scoring {
     pub struct AgariResult {
         pub han: u8,              // 飜 (Han count)
         pub fu: u8,               // 符 (Fu count)
-        pub yaku_list: Vec<Yaku>, // List of all yaku and dora achieved
-        #[allow(dead_code)]
-        pub num_akadora: u8, // 赤ドラ (Red Dora)
-        // The named limit
+        pub yaku_list: Vec<Yaku>, // all yaku and dora achieved
+        pub num_akadora: u8,      // 赤ドラ (Red Dora)
         pub limit_name: Option<HandLimit>,
-
-        #[allow(dead_code)]
-        pub base_points: u32,
         pub oya_payment: u32,
         pub ko_payment: u32,
         pub total_payment: u32,
@@ -338,7 +329,7 @@ pub mod scoring {
         pub is_oya: bool,
     }
 
-    // terminal version of Display for AgariResult. Not used in GUI
+    // terminal version of Display for AgariResult. No longer used
     impl fmt::Display for AgariResult {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             writeln!(f, "========== Score Result ==========")?;

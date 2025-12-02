@@ -21,17 +21,16 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                 honba,
                 agari_type,
                 is_oya,
-                ..
+                num_akadora,
             } = result;
 
-            // Check valid yaku
             let valid_yaku_count = yaku_list
                 .iter()
                 .filter(|y| !matches!(y, Yaku::Dora | Yaku::UraDora | Yaku::AkaDora))
                 .count();
 
-            // Error if no valid yaku and not a Yakuman
             if valid_yaku_count == 0 && limit_name.is_none() {
+                // Error message
                 column![
                     text("No Yaku Found")
                         .size(30)
@@ -44,6 +43,7 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                 .spacing(15)
                 .align_items(iced::Alignment::Center)
             } else {
+                // Success message
                 // Header
                 let header = text("Calculation Result")
                     .size(30)
@@ -55,19 +55,16 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                     .style(Color::from_rgb(0.8, 0.2, 0.2));
 
                 // Limit Name
-                let limit_text = if let Some(limit) = limit_name {
-                    let limit_str = match limit {
+                let limit_str = if let Some(limit) = limit_name {
+                    Some(match limit {
                         HandLimit::Mangan => "Mangan",
                         HandLimit::Haneman => "Haneman",
                         HandLimit::Baiman => "Baiman",
                         HandLimit::Sanbaiman => "Sanbaiman",
                         HandLimit::Yakuman => "Yakuman",
-                    };
-                    text(limit_str)
-                        .size(24)
-                        .style(Color::from_rgb(0.8, 0.0, 0.0))
+                    })
                 } else {
-                    text("")
+                    None
                 };
 
                 // Han/Fu Display
@@ -82,13 +79,12 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                     column![text("Yaku:").size(18).style(Color::from_rgb(0.3, 0.3, 0.3))];
                 let mut dora_count = 0;
                 let mut uradora_count = 0;
-                let mut akadora_count = 0;
 
                 for yaku in yaku_list {
                     match yaku {
                         Yaku::Dora => dora_count += 1,
                         Yaku::UraDora => uradora_count += 1,
-                        Yaku::AkaDora => akadora_count += 1,
+                        Yaku::AkaDora => {}
                         _ => {
                             yaku_col = yaku_col.push(text(format!("• {:?}", yaku)).size(18));
                         }
@@ -103,9 +99,8 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                     yaku_col =
                         yaku_col.push(text(format!("• Ura Dora x{}", uradora_count)).size(18));
                 }
-                if akadora_count > 0 {
-                    yaku_col =
-                        yaku_col.push(text(format!("• Aka Dora x{}", akadora_count)).size(18));
+                if *num_akadora > 0 {
+                    yaku_col = yaku_col.push(text(format!("• Aka Dora x{}", num_akadora)).size(18));
                 }
 
                 // Payment Detail Breakdown
@@ -143,16 +138,22 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
 
                 let payment_section = container(text(payment_text).size(16)).padding(10);
 
-                column![
-                    header,
-                    score_text,
-                    limit_text,
-                    han_fu_text,
-                    yaku_col.spacing(5),
-                    payment_section
-                ]
-                .spacing(15)
-                .align_items(iced::Alignment::Center)
+                // Build column conditionally with or without limit text
+                let mut result_column = column![header, score_text];
+
+                if let Some(limit) = limit_str {
+                    result_column = result_column
+                        .push(text(limit).size(24).style(Color::from_rgb(0.8, 0.0, 0.0)));
+                }
+
+                result_column = result_column
+                    .push(han_fu_text)
+                    .push(yaku_col.spacing(5))
+                    .push(payment_section)
+                    .spacing(15)
+                    .align_items(iced::Alignment::Center);
+
+                result_column
             }
         }
         Some(Err(_)) => column![

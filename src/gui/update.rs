@@ -261,9 +261,7 @@ impl Update for RiichiGui {
                         },
                         game_context: GameContext {
                             bakaze: self.bakaze,
-                            kyoku: 1,
                             honba: self.honba,
-                            riichi_bou: if self.is_riichi { 1 } else { 0 },
                             dora_indicators: self.dora_indicators.clone(),
                             uradora_indicators: self.uradora_indicators.clone(),
                             num_akadora: self.num_akadora,
