@@ -76,12 +76,17 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                 let han_fu_text = if limit_name.as_ref() == Some(&HandLimit::Yakuman) {
                     text(format!("{} Han", han)).size(20)
                 } else {
-                    text(format!("{} Han / {} Fu", han, fu)).size(20)
+                    text(format!("{} Han / {} Fu", han, fu))
+                        .size(20)
+                        .font(iced::Font {
+                            weight: iced::font::Weight::Bold,
+                            family: iced::font::Family::Name("Arial"),
+                            ..Default::default()
+                        })
                 };
 
                 // Yaku List Display
-                let mut yaku_col =
-                    column![text("Yaku:").size(18).style(Color::from_rgb(0.3, 0.3, 0.3))];
+                let mut yaku_col = column![];
                 let mut dora_count = 0;
                 let mut uradora_count = 0;
 
@@ -91,21 +96,48 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                         Yaku::UraDora => uradora_count += 1,
                         Yaku::AkaDora => {}
                         _ => {
-                            yaku_col = yaku_col.push(text(format!("• {:?}", yaku)).size(18));
+                            yaku_col = yaku_col.push(text(format!("• {:?}", yaku)).size(18).font(
+                                iced::Font {
+                                    weight: iced::font::Weight::Bold,
+                                    family: iced::font::Family::Name("Arial"),
+                                    ..Default::default()
+                                },
+                            ));
                         }
                     }
                 }
 
                 // Append bonus han counts
                 if dora_count > 0 {
-                    yaku_col = yaku_col.push(text(format!("• Dora x{}", dora_count)).size(18));
+                    yaku_col =
+                        yaku_col.push(text(format!("• Dora x{}", dora_count)).size(18).font(
+                            iced::Font {
+                                weight: iced::font::Weight::Bold,
+                                family: iced::font::Family::Name("Arial"),
+                                ..Default::default()
+                            },
+                        ));
                 }
                 if uradora_count > 0 {
-                    yaku_col =
-                        yaku_col.push(text(format!("• Ura Dora x{}", uradora_count)).size(18));
+                    yaku_col = yaku_col.push(
+                        text(format!("• Ura Dora x{}", uradora_count))
+                            .size(18)
+                            .font(iced::Font {
+                                weight: iced::font::Weight::Bold,
+                                family: iced::font::Family::Name("Arial"),
+                                ..Default::default()
+                            }),
+                    );
                 }
                 if *num_akadora > 0 {
-                    yaku_col = yaku_col.push(text(format!("• Aka Dora x{}", num_akadora)).size(18));
+                    yaku_col =
+                        yaku_col.push(text(format!("• Aka Dora x{}", num_akadora)).size(18).font(
+                            iced::Font {
+                                weight: iced::font::Weight::Bold,
+                                family: iced::font::Family::Name("Arial"),
+                                ..Default::default()
+                            },
+                        ));
                 }
 
                 // Payment Detail Breakdown
@@ -141,7 +173,12 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                     }
                 };
 
-                let payment_section = container(text(payment_text).size(16)).padding(10);
+                let payment_section = container(text(payment_text).size(16).font(iced::Font {
+                    weight: iced::font::Weight::Bold,
+                    family: iced::font::Family::Name("Arial"),
+                    ..Default::default()
+                }))
+                .padding(10);
 
                 let mut result_column = column![header, score_text];
 
@@ -171,8 +208,12 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
         Some(Err(_)) => column![
             text("No Yaku Found")
                 .size(30)
-                .style(Color::from_rgb(0.8, 0.0, 0.0)),
-            text("You need at least 1 Yaku to win.").size(20),
+                .style(Color::from_rgb(0.8, 0.0, 0.0))
+                .font(iced::Font {
+                    weight: iced::font::Weight::Bold,
+                    family: iced::font::Family::Name("Arial"),
+                    ..Default::default()
+                }),
         ]
         .spacing(15)
         .align_items(iced::Alignment::Center),
