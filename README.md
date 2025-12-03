@@ -3,22 +3,8 @@ _Created by Renyu (@Renyu-Liu), Thomas (@akakrabz), and Karan (@Karan-Annam) as 
 ## Introduction
 Riichi Mahjong has a complicated mechanism of scoring calculation. People often find it hard to calculate points manually. That's why we have introduced Riichi Mahjong Scoring Calculator. This is a Rust library that calculates the score of a winning Riichi Mahjong hand. It receives a complete input of the winning hand and game state and returns a detailed score breakdown, guiding players to redistribute their points.
 ## Installation
-### Prerequisites
-* **[Rust](https://rust-lang.org/tools/install/)** (Required)
 
-* **[Visual Studio](https://visualstudio.microsoft.com/downloads/?q=build+tools)** (Windows)
-
-* **[XCode](https://developer.apple.com/xcode/)** (MacOS)
-
-* **[Git](https://git-scm.com)** and **[VSCode](https://code.visualstudio.com)** (Alternative)
-  
-### Download & Run
-
-* Download and extract the ZIP file from [GitHub repo](https://github.com/Renyu-Liu/Riichi_Mahjong_Scoring_Calculator) or  run `git clone https://github.com/Renyu-Liu/Riichi_Mahjong_Scoring_Calculator.git` in terminal to clone the repository.
-
-* Run `cd .../Riichi_Mahjong_Scoring_Calculator(-main)` in terminal to enter program folder.
-
-* Run `cargo run` to launch the program. It will take a long time to compile for the initial run.
+See [RUN.md](RUN.md).
 
 ## User Manual
 
