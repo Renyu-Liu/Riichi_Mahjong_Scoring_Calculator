@@ -1,7 +1,7 @@
 # Riichi Mahjong Scoring Calculator
 _Created by Renyu (@Renyu-Liu), Thomas (@akakrabz), and Karan (@Karan-Annam) as the final project for [CS 128H](https://honors.cs128.org)_
 ## Introduction
-Riichi Mahjong has a complicated mechanism of scoring calculation. People often find it hard to calculate points manually. That's why we have introduced Riichi Mahjong Scoring Calculator. This is a Rust library that calculates the score of a winning Riichi Mahjong hand. It receives a complete input of the winning hand and game state and returns a detailed score breakdown, guiding players to redistribute their points.
+Riichi Mahjong has a complicated mechanism of scoring calculation. People often find it hard to calculate points manually. That's why we have introduced Riichi Mahjong Scoring Calculator. This is a Rust library that calculates the score of a winning Riichi Mahjong hand. It receives a complete input of the winning hand and game info and returns a detailed score breakdown, guiding players to redistribute their points.
 ## Installation
 
 See [RUN.md](RUN.md).
@@ -56,7 +56,7 @@ You may check for seats, context-dependent yaku, and choose the number of honba 
 
 Scroll down and click "Calculate Score" button to view the final score breakdown.
 
-<img width="1012" height="759" alt="image" src="https://github.com/user-attachments/assets/94c3780c-ad71-4df6-8786-6efbc2487dd0" />
+<img width="993" height="645" alt="image" src="https://github.com/user-attachments/assets/fe861cde-521c-48f9-a07d-de9130497efd" />
 
 The score breakdown includes the total points, fu/han points, and yaku detected. It also guides players to redistribute their points. It will show "No Yaku Found" if no yaku is detected. 
 
@@ -88,7 +88,7 @@ To familiarize yourself with yaku and scoring rules, you may click "Rules" butto
 
 * Some rare yaku with complicated rules are not correctly detected. We are working on it.
 
-* We found that this app has problem running on Windows system due to configuration issues. We are working on it.
+* We found that this app has problem running on Windows and Linux due to configuration issues. We are working on it.
 
 ## References
 
@@ -99,3 +99,5 @@ Yaku checker is based on [standard Riichi Mahjong yaku lists](https://riichi.wik
 Images of tiles are from [riichi-mahjong-tiles](https://github.com/FluffyStuff/riichi-mahjong-tiles).
 
 Image of Riichi Mahjong scoring rule is from [scoring rules sheet](https://www.reddit.com/r/Mahjong/comments/l5b221/riichi_mahjong_cheat_sheet_1_page_pdf_or_images/).
+
+Font: [Arimo](https://fonts.google.com/specimen/Arimo)
