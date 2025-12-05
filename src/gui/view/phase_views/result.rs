@@ -34,7 +34,11 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                 column![
                     text("No Yaku Found")
                         .size(30)
-                        .style(Color::from_rgb(0.8, 0.0, 0.0)),
+                        .style(Color::from_rgb(0.8, 0.0, 0.0))
+                        .font(iced::Font {
+                            weight: iced::font::Weight::Bold,
+                            ..iced::Font::with_name("Arimo")
+                        }),
                     text("You need at least 1 Yaku to win.").size(20),
                     text("(Dora does not count as Yaku)")
                         .size(16)
@@ -44,15 +48,15 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                 .align_items(iced::Alignment::Center)
             } else {
                 // Success message
-                // Header
-                let header = text("Calculation Result")
-                    .size(30)
-                    .style(Color::from_rgb(0.0, 0.0, 0.0));
-
+                let hand_preview = gui.view_hand_preview_locked();
                 // Total Score
                 let score_text = text(format!("{} Points", total_payment))
                     .size(40)
-                    .style(Color::from_rgb(0.8, 0.2, 0.2));
+                    .style(Color::from_rgb(0.8, 0.2, 0.2))
+                    .font(iced::Font {
+                        weight: iced::font::Weight::Bold,
+                        ..iced::Font::with_name("Arimo")
+                    });
 
                 // Limit Name
                 let limit_str = if let Some(limit) = limit_name {
@@ -85,7 +89,12 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                         Yaku::UraDora => uradora_count += 1,
                         Yaku::AkaDora => {}
                         _ => {
-                            yaku_col = yaku_col.push(text(format!("• {:?}", yaku)).size(18));
+                            yaku_col = yaku_col.push(text(format!("• {:?}", yaku)).size(18).font(
+                                iced::Font {
+                                    weight: iced::font::Weight::Bold,
+                                    ..iced::Font::with_name("Arimo")
+                                },
+                            ));
                         }
                     }
                 }
@@ -135,13 +144,28 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
                     }
                 };
 
-                let payment_section = container(text(payment_text).size(16)).padding(10);
+                let payment_section = container(text(payment_text).size(16).font(iced::Font {
+                    weight: iced::font::Weight::Bold,
+                    ..iced::Font::with_name("Arimo")
+                }))
+                .padding(10);
 
-                let mut result_column = column![header, score_text];
+                let mut result_column = column![
+                    hand_preview,
+                    iced::widget::Space::with_height(Length::Fixed(20.0)),
+                    score_text
+                ];
 
                 if let Some(limit) = limit_str {
-                    result_column = result_column
-                        .push(text(limit).size(24).style(Color::from_rgb(0.8, 0.0, 0.0)));
+                    result_column = result_column.push(
+                        text(limit)
+                            .size(24)
+                            .style(Color::from_rgb(0.8, 0.0, 0.0))
+                            .font(iced::Font {
+                                weight: iced::font::Weight::Bold,
+                                ..iced::Font::with_name("Arimo")
+                            }),
+                    );
                 }
 
                 result_column = result_column
@@ -158,6 +182,10 @@ pub fn build_result_view(gui: &RiichiGui) -> Element<'_, Message> {
             text("No Yaku Found")
                 .size(30)
                 .style(Color::from_rgb(0.8, 0.0, 0.0))
+                .font(iced::Font {
+                    weight: iced::font::Weight::Bold,
+                    ..iced::Font::with_name("Arimo")
+                })
         ]
         .spacing(15)
         .align_items(iced::Alignment::Center),

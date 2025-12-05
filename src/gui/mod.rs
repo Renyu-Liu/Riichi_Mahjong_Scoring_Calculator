@@ -12,7 +12,17 @@ use self::view::View;
 use iced::{Element, Sandbox, Settings};
 
 pub fn run() -> iced::Result {
-    RiichiGui::run(Settings::default())
+    let mut settings = Settings::default();
+    settings.fonts = vec![
+        include_bytes!("../../assets/font/Arimo.ttf")
+            .as_slice()
+            .into(),
+        include_bytes!("../../assets/font/Arimo-Bold.ttf")
+            .as_slice()
+            .into(),
+    ];
+    settings.default_font = iced::Font::with_name("Arimo");
+    RiichiGui::run(settings)
 }
 
 impl Sandbox for RiichiGui {

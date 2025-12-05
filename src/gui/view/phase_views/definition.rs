@@ -18,7 +18,10 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
 
     // Winning Tile Section
     let winning_tile_section = column![
-        text("Winning Tile").size(20),
+        text("Winning Tile").size(20).font(iced::Font {
+            weight: iced::font::Weight::Bold,
+            ..iced::Font::with_name("Arimo")
+        }),
         match &gui.winning_tile {
             Some(t) => {
                 {
@@ -55,7 +58,10 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
 
     // Melds Section
     let melds_section = column![
-        text("Open Melds").size(20),
+        text("Open Melds").size(20).font(iced::Font {
+            weight: iced::font::Weight::Bold,
+            ..iced::Font::with_name("Arimo")
+        }),
         // Display existing open melds
         column(
             gui.open_melds
@@ -108,7 +114,7 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                         })
                         .collect::<Vec<Element<Message>>>())
                     .spacing(2);
-
+                    // remove?
                     row![
                         tile_images,
                         button(text("Change"))
@@ -184,7 +190,10 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
     };
 
     let context_section = column![
-        text("Game Info").size(20),
+        text("Game Info").size(20).font(iced::Font {
+            weight: iced::font::Weight::Bold,
+            ..iced::Font::with_name("Arimo")
+        }),
         // Agari Type
         row![
             text("Win Type:"),
@@ -245,7 +254,10 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
         iced::widget::rule::Rule::horizontal(30),
         // Special Yaku
         column![
-            text("Special Yaku").size(20),
+            text("Special Yaku").size(20).font(iced::Font {
+                weight: iced::font::Weight::Bold,
+                ..iced::Font::with_name("Arimo")
+            }),
             // Riichi & Status
             row![
                 checkbox_with_conflict("Riichi", gui.is_riichi, Message::ToggleRiichi, is_menzen),
@@ -295,7 +307,10 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
         ]
         .spacing(5)
         .align_items(iced::Alignment::Center),
-        text("Dora").size(20),
+        text("Dora").size(20).font(iced::Font {
+            weight: iced::font::Weight::Bold,
+            ..iced::Font::with_name("Arimo")
+        }),
         // Dora Indicators
         column![
             text("Dora:"),
