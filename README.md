@@ -96,6 +96,8 @@ Scoring calculation is based on [standard Riichi Mahjong scoring rules](https://
 
 Yaku checker is based on [standard Riichi Mahjong yaku lists](https://riichi.wiki/List_of_yaku).
 
+Note: red dora varies in different versions. We use 1 5-man, 2 5-pin, 1 5-sou as the red dora.
+
 Images of tiles are from [riichi-mahjong-tiles](https://github.com/FluffyStuff/riichi-mahjong-tiles).
 
 Image of Riichi Mahjong scoring rule is from [scoring rules sheet](https://www.reddit.com/r/Mahjong/comments/l5b221/riichi_mahjong_cheat_sheet_1_page_pdf_or_images/).

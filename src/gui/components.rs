@@ -21,25 +21,26 @@ impl<'a> OnPressMaybe for button::Button<'a, Message> {
 
 pub fn get_tile_image_path(tile: &Hai) -> String {
     let filename = match tile {
-        Hai::Suhai(Suhai {
-            number: n,
-            suit: Suit::Manzu,
-        }) => format!("Man{}.png", n),
-        Hai::Suhai(Suhai {
-            number: n,
-            suit: Suit::Pinzu,
-        }) => format!("Pin{}.png", n),
-        Hai::Suhai(Suhai {
-            number: n,
-            suit: Suit::Souzu,
-        }) => format!("Sou{}.png", n),
-        Hai::Jihai(Jihai::Kaze(Kaze::Ton)) => "Ton.png".to_string(),
-        Hai::Jihai(Jihai::Kaze(Kaze::Nan)) => "Nan.png".to_string(),
-        Hai::Jihai(Jihai::Kaze(Kaze::Shaa)) => "Shaa.png".to_string(),
-        Hai::Jihai(Jihai::Kaze(Kaze::Pei)) => "Pei.png".to_string(),
-        Hai::Jihai(Jihai::Sangen(Sangenpai::Haku)) => "Haku.png".to_string(),
-        Hai::Jihai(Jihai::Sangen(Sangenpai::Hatsu)) => "Hatsu.png".to_string(),
-        Hai::Jihai(Jihai::Sangen(Sangenpai::Chun)) => "Chun.png".to_string(),
+        Hai::Suhai(Suhai { number, suit }) => {
+            let suit_prefix = match suit {
+                Suit::Manzu => "Man",
+                Suit::Pinzu => "Pin",
+                Suit::Souzu => "Sou",
+            };
+            format!("{}{}.png", suit_prefix, number)
+        }
+        Hai::Jihai(jihai) => {
+            let name = match jihai {
+                Jihai::Kaze(Kaze::Ton) => "Ton",
+                Jihai::Kaze(Kaze::Nan) => "Nan",
+                Jihai::Kaze(Kaze::Shaa) => "Shaa",
+                Jihai::Kaze(Kaze::Pei) => "Pei",
+                Jihai::Sangen(Sangenpai::Haku) => "Haku",
+                Jihai::Sangen(Sangenpai::Hatsu) => "Hatsu",
+                Jihai::Sangen(Sangenpai::Chun) => "Chun",
+            };
+            format!("{}.png", name)
+        }
     };
     format!("assets/{}", filename)
 }

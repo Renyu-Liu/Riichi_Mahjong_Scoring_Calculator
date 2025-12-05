@@ -45,7 +45,18 @@ impl Update for RiichiGui {
 
             // --- Definition Phase ---
             Message::ModifyHand => {
-                // go to composition phase
+                for meld in &self.open_melds {
+                    for tile in self.get_meld_tiles(meld) {
+                        self.hand_tiles.push(tile);
+                    }
+                }
+                for kan_tile in &self.closed_kans {
+                    for _ in 0..4 {
+                        self.hand_tiles.push(*kan_tile);
+                    }
+                }
+                self.hand_tiles.sort_by_key(sort_tiles_by_type);
+
                 self.phase = Phase::Composition;
                 self.winning_tile = None;
                 self.open_melds.clear();
@@ -66,6 +77,14 @@ impl Update for RiichiGui {
                 // Add a meld
                 if let Phase::SelectingMeldTile(_) = self.phase {
                     if self.can_form_meld(&meld) {
+                        // Remove tiles from hand
+                        let tiles = self.get_meld_tiles(&meld);
+                        for tile in tiles {
+                            if let Some(pos) = self.hand_tiles.iter().position(|x| x == &tile) {
+                                self.hand_tiles.remove(pos);
+                            }
+                        }
+
                         self.open_melds.push(meld);
 
                         // Reset if open hand
@@ -85,20 +104,38 @@ impl Update for RiichiGui {
                 self.phase = Phase::SelectingClosedKan;
             }
             Message::SelectClosedKan(tile) => {
-                // Add closed Kan
+                // Remove 4 tiles from hand
+                for _ in 0..4 {
+                    if let Some(pos) = self.hand_tiles.iter().position(|x| x == &tile) {
+                        self.hand_tiles.remove(pos);
+                    }
+                }
                 self.closed_kans.push(tile);
                 self.phase = Phase::Definition;
             }
 
-            // Message::EditClosedKan(idx) removed
             Message::RemoveOpenMeld(idx) => {
                 if idx < self.open_melds.len() {
-                    self.open_melds.remove(idx);
+                    let meld = self.open_melds.remove(idx);
+                    for tile in self.get_meld_tiles(&meld) {
+                        // Return to Hand
+                        self.hand_tiles.push(tile);
+                        // Update counts for composition (legacy but kept for safety)
+                        let t_idx = crate::implements::tiles::tile_to_index(&tile);
+                        self.tile_counts[t_idx] += 1;
+                    }
+                    self.hand_tiles.sort_by_key(sort_tiles_by_type);
                 }
             }
             Message::RemoveClosedKan(idx) => {
                 if idx < self.closed_kans.len() {
-                    self.closed_kans.remove(idx);
+                    let tile = self.closed_kans.remove(idx);
+                    for _ in 0..4 {
+                        self.hand_tiles.push(tile);
+                    }
+                    let t_idx = crate::implements::tiles::tile_to_index(&tile);
+                    self.tile_counts[t_idx] += 4;
+                    self.hand_tiles.sort_by_key(sort_tiles_by_type);
                 }
             }
 
@@ -200,25 +237,6 @@ impl Update for RiichiGui {
             Message::CalculateScore => {
                 if let Some(winning_tile) = self.winning_tile {
                     let mut hand_tiles = self.hand_tiles.clone();
-
-                    // Remove open melds
-                    for meld in &self.open_melds {
-                        let tiles = self.get_meld_tiles(meld);
-                        for t in tiles {
-                            if let Some(pos) = hand_tiles.iter().position(|x| x == &t) {
-                                hand_tiles.remove(pos);
-                            }
-                        }
-                    }
-
-                    // Remove closed kans
-                    for kan in &self.closed_kans {
-                        for _ in 0..4 {
-                            if let Some(pos) = hand_tiles.iter().position(|x| x == kan) {
-                                hand_tiles.remove(pos);
-                            }
-                        }
-                    }
 
                     // Remove winning tile if Ron
                     if self.agari_type == AgariType::Ron {

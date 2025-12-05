@@ -107,16 +107,11 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                         })
                         .collect::<Vec<Element<Message>>>())
                     .spacing(2);
-                    // remove?
                     row![
-                        tile_images,
-                        action_button(
-                            "Remove",
-                            Message::RemoveClosedKan(i),
-                            ColoredButtonStyle::DANGER,
-                        )
+                        button(tile_images)
+                            .on_press(Message::RemoveClosedKan(i))
+                            .style(theme::Button::Text)
                     ]
-                    .spacing(10)
                     .align_items(iced::Alignment::Center)
                     .into()
                 })
@@ -342,9 +337,9 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
         .align_items(iced::Alignment::Center),
         // Akadora Counter
         {
-            let five_tile_count = gui.count_five_tiles();
+            let max_akadora = gui.get_max_akadora_count();
 
-            if five_tile_count > 0 {
+            if max_akadora > 0 {
                 row![
                     text(format!("Akadora: {}", gui.num_akadora)),
                     button(text("+"))
@@ -352,13 +347,11 @@ pub fn build_definition_view(gui: &RiichiGui) -> Element<'_, Message> {
                             background_color: Color::from_rgb(0.0, 0.0, 0.6),
                             text_color: Color::WHITE,
                         })))
-                        .on_press_maybe(
-                            if gui.num_akadora < five_tile_count && gui.num_akadora < 4 {
-                                Some(Message::IncrementAkadora)
-                            } else {
-                                None
-                            }
-                        ),
+                        .on_press_maybe(if gui.num_akadora < max_akadora && gui.num_akadora < 4 {
+                            Some(Message::IncrementAkadora)
+                        } else {
+                            None
+                        }),
                     button(text("-"))
                         .style(theme::Button::Custom(Box::new(ColoredButtonStyle {
                             background_color: Color::from_rgb(0.6, 0.0, 0.0),

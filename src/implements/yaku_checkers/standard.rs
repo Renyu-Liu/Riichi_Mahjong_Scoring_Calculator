@@ -238,6 +238,15 @@ fn check_yakuhai(hand: &AgariHand, player: &PlayerContext, game: &GameContext) -
 }
 
 fn check_pinfu(hand: &AgariHand, player: &PlayerContext, game: &GameContext) -> bool {
+    // Kantsu check
+    if hand
+        .mentsu
+        .iter()
+        .any(|m| m.mentsu_type == MentsuType::Kantsu)
+    {
+        return false;
+    }
+
     // menzen check
     if !player.is_menzen {
         return false;
@@ -276,28 +285,18 @@ fn check_peikou<'a>(shuntsu: &[&'a Mentsu]) -> (bool, bool) {
         return (false, false);
     }
 
-    let mut identical_pairs = 0;
-    let mut seen = HashSet::new();
-
-    for (i, m1) in shuntsu.iter().enumerate() {
-        if seen.contains(&i) {
-            continue;
-        }
-        for (j, m2) in shuntsu.iter().enumerate() {
-            if i == j || seen.contains(&j) {
-                continue;
-            }
-
-            if m1.tiles[0] == m2.tiles[0] {
-                identical_pairs += 1;
-                seen.insert(i);
-                seen.insert(j);
-                break;
-            }
-        }
+    let mut counts = HashMap::new();
+    for m in shuntsu {
+        *counts.entry(m.tiles[0]).or_insert(0) += 1;
     }
-    // (lipeikou, ryanpeikou)
-    (identical_pairs == 1, identical_pairs == 2)
+
+    let mut pairs = 0;
+    for count in counts.values() {
+        pairs += count / 2;
+    }
+
+    // (iipeikou, ryanpeikou)
+    (pairs == 1, pairs == 2)
 }
 
 fn check_sanshoku_generic(mentsu_list: &[&Mentsu]) -> bool {
@@ -450,4 +449,80 @@ pub fn check_honitsu(all_tiles: &[Hai]) -> (bool, Option<Suit>) {
 pub fn check_chinitsu(all_tiles: &[Hai]) -> (bool, Option<Suit>) {
     let (_hon, chin, suit) = check_color(all_tiles);
     (chin, suit)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::implements::hand::{Mentsu, MentsuType};
+    use crate::implements::tiles::{Hai, Suhai, Suit};
+
+    fn make_shuntsu(suit: Suit, start_num: u8) -> Mentsu {
+        Mentsu {
+            mentsu_type: MentsuType::Shuntsu,
+            is_minchou: false,
+            tiles: [
+                Hai::Suhai(Suhai {
+                    number: start_num,
+                    suit,
+                }),
+                Hai::Suhai(Suhai {
+                    number: start_num + 1,
+                    suit,
+                }),
+                Hai::Suhai(Suhai {
+                    number: start_num + 2,
+                    suit,
+                }),
+                Hai::Suhai(Suhai {
+                    number: 0,
+                    suit: Suit::Manzu,
+                }), // padding
+            ],
+        }
+    }
+
+    #[test]
+    fn test_ryanpeikou_four_identical() {
+        // 4 identical sequences -> 2 pairs -> Ryanpeikou
+        let m1 = make_shuntsu(Suit::Manzu, 2);
+        let m2 = make_shuntsu(Suit::Manzu, 2);
+        let m3 = make_shuntsu(Suit::Manzu, 2);
+        let m4 = make_shuntsu(Suit::Manzu, 2);
+
+        let shuntsu = vec![&m1, &m2, &m3, &m4];
+        let (iipeikou, ryanpeikou) = check_peikou(&shuntsu);
+
+        assert_eq!(ryanpeikou, true, "Should be Ryanpeikou (4 identical)");
+        assert_eq!(iipeikou, false, "Should not be just Iipeikou");
+    }
+
+    #[test]
+    fn test_iipeikou_three_identical() {
+        // 3 identical sequences -> 1 pair -> Iipeikou
+        let m1 = make_shuntsu(Suit::Manzu, 2);
+        let m2 = make_shuntsu(Suit::Manzu, 2);
+        let m3 = make_shuntsu(Suit::Manzu, 2);
+
+        let shuntsu = vec![&m1, &m2, &m3];
+        let (iipeikou, ryanpeikou) = check_peikou(&shuntsu);
+
+        assert_eq!(iipeikou, true, "Should be Iipeikou (3 identical)");
+        assert_eq!(ryanpeikou, false);
+    }
+
+    #[test]
+    fn test_ryanpeikou_two_pairs() {
+        // 2 identical + 2 identical -> 2 pairs -> Ryanpeikou
+        let m1 = make_shuntsu(Suit::Manzu, 2);
+        let m2 = make_shuntsu(Suit::Manzu, 2);
+        let m3 = make_shuntsu(Suit::Pinzu, 5);
+        let m4 = make_shuntsu(Suit::Pinzu, 5);
+
+        let shuntsu = vec![&m1, &m2, &m3, &m4];
+        let (iipeikou, ryanpeikou) = check_peikou(&shuntsu);
+
+        assert_eq!(ryanpeikou, true, "Should be Ryanpeikou (2 different pairs)");
+        assert_eq!(iipeikou, false);
+    }
 }

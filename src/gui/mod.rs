@@ -33,7 +33,7 @@ impl Sandbox for RiichiGui {
     }
 
     fn title(&self) -> String {
-        String::from("Riichi Mahjong Calculator")
+        String::from("Riichi Mahjong Scoring Calculator")
     }
 
     fn update(&mut self, message: Message) {

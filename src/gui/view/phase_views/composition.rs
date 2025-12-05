@@ -16,7 +16,11 @@ pub fn build_composition_view(gui: &RiichiGui) -> Element<'_, Message> {
 
     let counter_text = text(format!("Winning Hand: {}/18", tile_count))
         .size(20)
-        .style(counter_color);
+        .style(counter_color)
+        .font(iced::Font {
+            weight: iced::font::Weight::Bold,
+            ..iced::Font::with_name("Arimo")
+        });
 
     let confirm_btn = button(text("Confirm Hand"))
         .style(theme::Button::Custom(Box::new(ColoredButtonStyle::PRIMARY)))
