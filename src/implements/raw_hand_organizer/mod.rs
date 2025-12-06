@@ -1,133 +1,14 @@
-// raw_hand_organizer.rs: Organizes a raw hand input into standard melds and pair
+pub mod recursive_parser;
+pub mod wait_analyzer;
 
-use super::types::{
+use self::{recursive_parser::find_all_mentsu_recursive, wait_analyzer::determine_wait_type};
+use crate::implements::types::{
     game::AgariType,
     hand::{AgariHand, HandOrganization, Machi, Mentsu, MentsuType},
     input::UserInput,
-    tiles::{Hai, index_to_tile, tile_to_index},
+    tiles::{index_to_tile, tile_to_index},
 };
 use std::convert::TryInto;
-
-// find melds
-mod recursive_parser {
-    use super::*;
-
-    pub fn find_all_mentsu_recursive(
-        counts: &mut [u8; 34],
-        mentsu: &mut Vec<Mentsu>,
-        results: &mut Vec<Vec<Mentsu>>,
-    ) {
-        let mut i = 0;
-        while i < 34 && counts[i] == 0 {
-            i += 1;
-        }
-        if i == 34 {
-            results.push(mentsu.clone());
-            return;
-        }
-
-        // Find Koutsu
-        if counts[i] >= 3 {
-            let tile = index_to_tile(i);
-            counts[i] -= 3;
-            mentsu.push(Mentsu {
-                mentsu_type: MentsuType::Koutsu,
-                is_minchou: false,
-                tiles: [tile, tile, tile, tile],
-            });
-
-            find_all_mentsu_recursive(counts, mentsu, results);
-
-            mentsu.pop();
-            counts[i] += 3;
-        }
-
-        // Find Shuntsu
-        if i < 27 && (i % 9) < 7 && counts[i] > 0 && counts[i + 1] > 0 && counts[i + 2] > 0 {
-            let tile1 = index_to_tile(i);
-            let tile2 = index_to_tile(i + 1);
-            let tile3 = index_to_tile(i + 2);
-
-            counts[i] -= 1;
-            counts[i + 1] -= 1;
-            counts[i + 2] -= 1;
-            mentsu.push(Mentsu {
-                mentsu_type: MentsuType::Shuntsu,
-                is_minchou: false,
-                tiles: [tile1, tile2, tile3, tile3],
-            });
-
-            find_all_mentsu_recursive(counts, mentsu, results);
-
-            mentsu.pop();
-            counts[i] += 1;
-            counts[i + 1] += 1;
-            counts[i + 2] += 1;
-        }
-    }
-}
-
-// Wait Type
-mod wait_analyzer {
-    use super::*;
-
-    fn mentsu_contains_tile(mentsu: &Mentsu, tile: &Hai) -> bool {
-        match mentsu.mentsu_type {
-            MentsuType::Koutsu | MentsuType::Kantsu => mentsu.tiles[0] == *tile,
-            MentsuType::Shuntsu => {
-                mentsu.tiles[0] == *tile || mentsu.tiles[1] == *tile || mentsu.tiles[2] == *tile
-            }
-        }
-    }
-
-    pub fn determine_wait_type(
-        mentsu: &[Mentsu; 4],
-        atama: (Hai, Hai),
-        agari_hai: Hai,
-    ) -> Vec<Machi> {
-        let mut possible_waits = Vec::new();
-
-        if agari_hai == atama.0 {
-            possible_waits.push(Machi::Tanki);
-        }
-
-        let winning_melds: Vec<&Mentsu> = mentsu
-            .iter()
-            .filter(|m| mentsu_contains_tile(m, &agari_hai))
-            .collect();
-
-        for winning_meld in winning_melds {
-            let machi = match winning_meld.mentsu_type {
-                MentsuType::Koutsu | MentsuType::Kantsu => Machi::Shanpon,
-                MentsuType::Shuntsu => {
-                    let t1 = winning_meld.tiles[0];
-                    let t2 = winning_meld.tiles[1];
-                    let t3 = winning_meld.tiles[2];
-
-                    if agari_hai == t2 {
-                        Machi::Kanchan
-                    } else if agari_hai == t1 {
-                        if tile_to_index(&t3) % 9 == 8 {
-                            Machi::Penchan
-                        } else {
-                            Machi::Ryanmen
-                        }
-                    } else if agari_hai == t3 {
-                        if tile_to_index(&t1) % 9 == 0 {
-                            Machi::Penchan
-                        } else {
-                            Machi::Ryanmen
-                        }
-                    } else {
-                        continue;
-                    }
-                }
-            };
-            possible_waits.push(machi);
-        }
-        possible_waits
-    }
-}
 
 pub fn organize_hand(input: &UserInput) -> Result<Vec<HandOrganization>, &'static str> {
     let mut master_counts = [0u8; 34];
@@ -233,7 +114,7 @@ pub fn organize_hand(input: &UserInput) -> Result<Vec<HandOrganization>, &'stati
                 let mut closed_mentsu: Vec<Mentsu> = Vec::with_capacity(mentsu_needed);
                 let mut recursive_results: Vec<Vec<Mentsu>> = Vec::new();
 
-                recursive_parser::find_all_mentsu_recursive(
+                find_all_mentsu_recursive(
                     &mut temp_counts,
                     &mut closed_mentsu,
                     &mut recursive_results,
@@ -248,8 +129,7 @@ pub fn organize_hand(input: &UserInput) -> Result<Vec<HandOrganization>, &'stati
                             .try_into()
                             .map_err(|_| "final_mentsu length not 4")?;
 
-                        let possible_waits =
-                            wait_analyzer::determine_wait_type(&mentsu_array, atama, agari_hai);
+                        let possible_waits = determine_wait_type(&mentsu_array, atama, agari_hai);
 
                         for machi in possible_waits {
                             let agari_hand = AgariHand {

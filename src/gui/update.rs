@@ -43,16 +43,8 @@ impl Update for RiichiGui {
 
             // --- Definition Phase ---
             Message::ModifyHand => {
-                for meld in &self.open_melds {
-                    for tile in self.get_meld_tiles(meld) {
-                        self.hand_tiles.push(tile);
-                    }
-                }
-                for kan_tile in &self.closed_kans {
-                    for _ in 0..4 {
-                        self.hand_tiles.push(*kan_tile);
-                    }
-                }
+                self.open_melds.clear();
+                self.closed_kans.clear();
                 self.hand_tiles.sort_by_key(sort_tiles_by_type);
 
                 self.phase = Phase::Composition;
@@ -75,14 +67,6 @@ impl Update for RiichiGui {
                 // Add a meld
                 if let Phase::SelectingMeldTile(_) = self.phase {
                     if self.can_form_meld(&meld) {
-                        // Remove tiles from hand
-                        let tiles = self.get_meld_tiles(&meld);
-                        for tile in tiles {
-                            if let Some(pos) = self.hand_tiles.iter().position(|x| x == &tile) {
-                                self.hand_tiles.remove(pos);
-                            }
-                        }
-
                         self.open_melds.push(meld);
 
                         // Reset if open hand
@@ -102,36 +86,19 @@ impl Update for RiichiGui {
                 self.phase = Phase::SelectingClosedKan;
             }
             Message::SelectClosedKan(tile) => {
-                // Remove 4 tiles from hand
-                for _ in 0..4 {
-                    if let Some(pos) = self.hand_tiles.iter().position(|x| x == &tile) {
-                        self.hand_tiles.remove(pos);
-                    }
-                }
                 self.closed_kans.push(tile);
                 self.phase = Phase::Definition;
             }
 
             Message::RemoveOpenMeld(idx) => {
                 if idx < self.open_melds.len() {
-                    let meld = self.open_melds.remove(idx);
-                    for tile in self.get_meld_tiles(&meld) {
-                        // Return to Hand
-                        self.hand_tiles.push(tile);
-                        let t_idx = crate::implements::tiles::tile_to_index(&tile);
-                        self.tile_counts[t_idx] += 1;
-                    }
+                    let _meld = self.open_melds.remove(idx);
                     self.hand_tiles.sort_by_key(sort_tiles_by_type);
                 }
             }
             Message::RemoveClosedKan(idx) => {
                 if idx < self.closed_kans.len() {
-                    let tile = self.closed_kans.remove(idx);
-                    for _ in 0..4 {
-                        self.hand_tiles.push(tile);
-                    }
-                    let t_idx = crate::implements::tiles::tile_to_index(&tile);
-                    self.tile_counts[t_idx] += 4;
+                    let _tile = self.closed_kans.remove(idx);
                     self.hand_tiles.sort_by_key(sort_tiles_by_type);
                 }
             }
@@ -235,9 +202,27 @@ impl Update for RiichiGui {
                 if let Some(winning_tile) = self.winning_tile {
                     let mut hand_tiles = self.hand_tiles.clone();
 
+                    // Filter out Open Melds
+                    for meld in &self.open_melds {
+                        for tile in self.get_meld_tiles(meld) {
+                            if let Some(pos) = hand_tiles.iter().position(|x| *x == tile) {
+                                hand_tiles.remove(pos);
+                            }
+                        }
+                    }
+
+                    // Filter out Closed Kans
+                    for tile in &self.closed_kans {
+                        for _ in 0..4 {
+                            if let Some(pos) = hand_tiles.iter().position(|x| *x == *tile) {
+                                hand_tiles.remove(pos);
+                            }
+                        }
+                    }
+
                     // Remove winning tile if Ron
                     if self.agari_type == AgariType::Ron {
-                        if let Some(pos) = hand_tiles.iter().position(|x| x == &winning_tile) {
+                        if let Some(pos) = hand_tiles.iter().position(|x| *x == winning_tile) {
                             hand_tiles.remove(pos);
                         }
                     }

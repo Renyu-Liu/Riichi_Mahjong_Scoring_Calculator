@@ -6,7 +6,6 @@ use crate::implements::{
     yaku_checkers::{standard::color::check_chinitsu, utils::get_all_tiles},
 };
 
-/// Chuuren Poutou
 pub fn check_chuuren(hand: &AgariHand) -> Option<bool> {
     let all_tiles = get_all_tiles(hand);
 

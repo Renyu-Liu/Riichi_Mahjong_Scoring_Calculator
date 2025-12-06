@@ -19,7 +19,6 @@ pub struct YakuResult {
     pub num_akadora: u8,
 }
 
-// will be called by score_calculator.rs
 pub fn check_all_yaku(
     organization: HandOrganization,
     player: &PlayerContext,

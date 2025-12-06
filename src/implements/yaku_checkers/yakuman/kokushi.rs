@@ -4,7 +4,6 @@ use crate::implements::types::{
     yaku::Yaku,
 };
 
-/// Kokushi Musou
 pub fn check_kokushi(counts: &[u8; 34], agari_hai: Hai) -> Option<(HandStructure, Yaku)> {
     let mut has_pair = false;
     let mut tiles = Vec::new();
